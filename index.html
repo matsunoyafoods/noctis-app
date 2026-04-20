@@ -19,8 +19,41 @@
   --r:12px;--rsm:8px;
   --font:'Noto Sans JP',sans-serif;--mono:'DM Mono',monospace;
 }
-html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-family:var(--font)}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+html,body{height:100%;width:100%;font-family:var(--font);background:var(--bg)}
+
+/* ── DESKTOP: スマホフレーム表示 ── */
+@media(min-width:600px){
+  body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #desktop-wrap{
+    position:relative;
+    width:393px;
+    height:852px;
+    border-radius:44px;
+    overflow:hidden;
+    box-shadow:0 0 0 10px #1A1828, 0 0 0 11px #2A2840, 0 40px 80px rgba(0,0,0,0.8), 0 0 60px rgba(255,77,141,0.15);
+    flex-shrink:0;
+  }
+  #app{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);border-radius:44px;overflow:hidden}
+  /* PC切り替えボタン */
+  #view-toggle{
+    position:fixed;top:16px;right:16px;
+    display:flex;gap:8px;z-index:9999;
+  }
+  #view-toggle button{
+    padding:8px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);
+    background:rgba(18,16,30,0.9);color:#C8D0E8;font-size:12px;cursor:pointer;
+    font-family:var(--font);backdrop-filter:blur(10px);transition:.15s;
+  }
+  #view-toggle button.active{background:var(--pk);color:#fff;border-color:var(--pk)}
+  #view-toggle button:hover{border-color:var(--pkb)}
+}
+
+/* ── MOBILE: フルスクリーン ── */
+@media(max-width:599px){
+  #desktop-wrap{width:100%;height:100%;position:fixed;inset:0}
+  #app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+  #view-toggle{display:none!important}
+}
 .sc{display:none;flex-direction:column;height:100%;overflow:hidden}
 .sc.on{display:flex}
 .hdr{flex-shrink:0;padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--bdr);background:rgba(8,6,16,0.97)}
@@ -151,6 +184,11 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-famil
 </style>
 </head>
 <body>
+<div id="view-toggle">
+  <button class="active" onclick="setView('phone')" id="btn-phone">&#128241; スマホ</button>
+  <button onclick="setView('full')" id="btn-full">&#128421; フル画面</button>
+</div>
+<div id="desktop-wrap">
 <div id="app">
 
 <!-- ===== ONBOARDING ===== -->
@@ -279,12 +317,32 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-famil
       <div class="tc" onclick="selTmpl(this,'求人募集')"><span class="tc-i">&#128226;</span><div class="tc-n">求人募集</div><div class="tc-d">直接的な求人訴求</div></div>
       <div class="tc" onclick="selTmpl(this,'体験入店')"><span class="tc-i">&#128134;</span><div class="tc-n">体験入店</div><div class="tc-d">体験入店を訴求</div></div>
     </div>
-    <div class="sec">③ キーワードを入力（任意）</div>
+    <div class="sec">③ 店舗テンプレを選ぶ（任意）</div>
+    <div id="store-tmpl-area" style="margin-bottom:14px">
+      <div style="display:flex;gap:6px;margin-bottom:8px;overflow-x:auto;padding-bottom:4px">
+        <button class="bsm" style="white-space:nowrap;font-size:12px;padding:7px 12px" onclick="applyStoreTmpl('basic')">基本テンプレ</button>
+        <button class="bsm" style="white-space:nowrap;font-size:12px;padding:7px 12px" onclick="applyStoreTmpl('luxury')">高級店向け</button>
+        <button class="bsm" style="white-space:nowrap;font-size:12px;padding:7px 12px" onclick="applyStoreTmpl('beginner')">未経験特化</button>
+        <button class="bsm" style="white-space:nowrap;font-size:12px;padding:7px 12px" onclick="applyStoreTmpl('parttime')">副業・WワークOK</button>
+      </div>
+      <div id="store-tmpl-preview" style="display:none;background:var(--card2);border:1px solid var(--pkb);border-radius:var(--rsm);padding:12px;font-size:12px;color:var(--txt2);line-height:1.8;margin-bottom:6px"></div>
+    </div>
+    <div class="sec">④ キーワードを入力（任意）</div>
     <textarea id="kw-input" class="sinp" rows="2" placeholder="例：新人・20歳・笑顔がかわいい・体験入店OK・新宿" style="resize:none;margin-bottom:6px"></textarea>
     <div style="font-size:11px;color:var(--txt3);margin-bottom:14px">キーワードをもとにAIが投稿文を生成します。空欄でもOK。</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:13px;color:var(--txt2);font-weight:500">絵文字を使う</span>
+        <button id="emoji-tog" class="tog on" onclick="toggleBtn(this)"><div class="tog-t"></div></button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:13px;color:var(--txt2);font-weight:500">長文モード</span>
+        <button id="long-tog" class="tog" onclick="toggleBtn(this)"><div class="tog-t"></div></button>
+      </div>
+    </div>
     <button class="btn" id="gbtn" onclick="doGen()">AIで投稿文を生成する</button>
     <div id="pres" style="display:none;margin-top:16px">
-      <div class="sec">④ 生成された投稿（直接編集できます）</div>
+      <div class="sec">⑤ 生成された投稿（直接編集できます）</div>
       <textarea id="gen-ta" class="sinp" rows="7" placeholder="ここに投稿文が表示されます" style="resize:none;margin-bottom:6px;font-size:13px;line-height:1.9"></textarea>
       <div id="gen-loading" style="display:none;align-items:center;gap:8px;color:var(--txt3);font-size:12px;padding:8px 0"><span class="spin">&#8987;</span><span>AIが生成中...</span></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -299,7 +357,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-famil
         <button class="btn-tone" onclick="adjTone('soft')">シンプルに</button>
       </div>
       <div class="ngok">&#10003; NGワードなし　凍結リスク：低</div>
-      <div class="sec">⑤ 配信先の確認</div>
+      <div class="sec">⑥ 配信先の確認</div>
       <div id="mpc" class="card" style="padding:11px 13px;margin-bottom:12px"></div>
       <div style="display:flex;gap:8px">
         <button class="bsm" style="flex:1" onclick="go('cal')">予約投稿</button>
@@ -355,12 +413,39 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-famil
     </div>
   </div></div>
   <div id="cal-modal" class="modal-wrap">
-    <div class="modal-box">
+    <div class="modal-box" style="max-height:90vh;overflow-y:auto">
       <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:14px" id="cal-modal-ttl">投稿を追加</div>
+
       <div class="srl" style="margin-bottom:4px">テンプレ</div>
-      <select class="sinp" id="m-tmpl" style="margin-bottom:10px"><option>女の子紹介</option><option>稼げる訴求</option><option>店舗の雰囲気</option><option>スタッフ投稿</option><option>求人募集</option><option>体験入店</option></select>
+      <select class="sinp" id="m-tmpl" style="margin-bottom:10px">
+        <option>女の子紹介</option><option>稼げる訴求</option><option>店舗の雰囲気</option><option>スタッフ投稿</option><option>求人募集</option><option>体験入店</option>
+      </select>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--txt2)">絵文字</span>
+          <button id="cal-emoji-tog" class="tog on" onclick="toggleBtn(this)"><div class="tog-t"></div></button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:var(--txt2)">長文モード</span>
+          <button id="cal-long-tog" class="tog" onclick="toggleBtn(this)"><div class="tog-t"></div></button>
+        </div>
+        <button class="bsm" id="cal-ai-btn" onclick="calGenAI()" style="font-size:11px;padding:6px 12px;border-color:var(--pkb);color:var(--pk2)">AIで生成</button>
+      </div>
+
+      <div class="srl" style="margin-bottom:4px">キーワード（任意）</div>
+      <input class="sinp" id="m-kw" placeholder="例：新人・20歳・体験入店OK" style="margin-bottom:10px">
+
       <div class="srl" style="margin-bottom:4px">投稿内容</div>
-      <textarea class="sinp" id="m-text" rows="4" style="resize:none;margin-bottom:10px"></textarea>
+      <textarea class="sinp" id="m-text" rows="5" style="resize:none;margin-bottom:10px" placeholder="投稿内容を入力、またはAIで生成してください"></textarea>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="btn-tone" onclick="calAdjTone('more')">もっと過激に</button>
+        <button class="btn-tone" onclick="calAdjTone('trust')">優しい印象</button>
+        <button class="btn-tone" onclick="calAdjTone('urgent')">緊急感UP</button>
+        <button class="btn-tone" onclick="calAdjTone('soft')">シンプルに</button>
+      </div>
+
       <div style="display:flex;gap:10px;margin-bottom:14px">
         <div style="flex:1"><div class="srl" style="margin-bottom:4px">時間</div><input class="sinp" id="m-time" type="time" value="21:00"></div>
         <div style="flex:1"><div class="srl" style="margin-bottom:4px">ステータス</div><select class="sinp" id="m-status"><option value="scheduled">予約中</option><option value="done">投稿済み</option></select></div>
@@ -496,16 +581,43 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-famil
     </div>
 
     <div class="dv"></div>
+    <div class="sec">AI設定</div>
+    <div class="srow">
+      <div class="srl">Claude APIキー <span style="color:var(--pk2);font-size:10px">（投稿生成・DM返信に必要）</span></div>
+      <div style="display:flex;gap:8px">
+        <input class="sinp" id="api-key-input" type="password" placeholder="sk-ant-api03-..." style="flex:1">
+        <button class="bsm" style="padding:10px 14px;white-space:nowrap" onclick="saveApiKey()">保存</button>
+      </div>
+      <div id="api-key-status" style="font-size:11px;margin-top:6px;color:var(--txt3)">APIキー未設定</div>
+    </div>
+    <div class="dv"></div>
     <div class="sec">店舗プロフィール</div>
     <div class="srow"><div class="srl">店舗名</div><input class="sinp" value="Club Stella 新宿店"></div>
-    <div class="srow"><div class="srl">業種</div><input class="sinp" value="デリバリーヘルス"></div>
-    <div class="srow"><div class="srl">ターゲット月収</div><input class="sinp" value="50〜100万円"></div>
+    <div class="srow"><div class="srl">業種</div>
+<select class="sinp">
+  <option>デリバリーヘルス</option>
+  <option>ソープランド</option>
+  <option>キャバクラ・クラブ</option>
+  <option>メンズエステ</option>
+  <option>セクキャバ</option>
+  <option>オナクラ</option>
+  <option>風俗エステ</option>
+  <option>その他</option>
+</select></div>
+    <div class="srow"><div class="srl">ターゲット年齢層</div>
+<select class="sinp">
+  <option>18〜20代前半（学生・フリーター）</option>
+  <option>20代全般</option>
+  <option>20〜30代（主婦・Wワーク歓迎）</option>
+  <option>30代以上歓迎</option>
+  <option>年齢不問・全年齢歓迎</option>
+</select></div>
     <div class="dv"></div>
     <div class="sec">自動化設定</div>
-    <div class="trow"><div><div class="tn">自動投稿スケジュール</div><div class="ts">AIが最適な時間に全SNSへ自動配信</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
-    <div class="trow"><div><div class="tn">NGワード自動チェック</div><div class="ts">凍結リスクを事前にスキャン</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
-    <div class="trow"><div><div class="tn">DM着信通知</div><div class="ts">新着DMを即時プッシュ通知</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
-    <div class="trow"><div><div class="tn">週次レポート</div><div class="ts">毎週月曜に成果レポートを送信</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
+    <div class="trow"><div><div class="tn">自動投稿スケジュール</div><div class="ts">AIが最適な時間に全SNSへ自動配信</div></div><button class="tog on" onclick="toggleBtn(this)"><div class="tog-t"></div></button></div>
+    <div class="trow"><div><div class="tn">NGワード自動チェック</div><div class="ts">凍結リスクを事前にスキャン</div></div><button class="tog on" onclick="toggleBtn(this)"><div class="tog-t"></div></button></div>
+    <div class="trow"><div><div class="tn">DM着信通知</div><div class="ts">新着DMを即時プッシュ通知</div></div><button class="tog on" onclick="toggleBtn(this)"><div class="tog-t"></div></button></div>
+    <div class="trow"><div><div class="tn">週次レポート</div><div class="ts">毎週月曜に成果レポートを送信</div></div><button class="tog on" onclick="toggleBtn(this)"><div class="tog-t"></div></button></div>
     <div style="height:14px"></div>
     <button class="bsm" style="width:100%;padding:12px;margin-bottom:8px">変更を保存する</button>
     <div style="text-align:center;font-size:10px;color:var(--txt3);padding-top:6px;font-family:var(--mono)">NOCTIS v4.0 — RECRUITMENT AI</div>
@@ -537,6 +649,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-famil
 </div>
 
 </div><!-- #app -->
+</div><!-- #desktop-wrap -->
 
 <script>
 // ── NAVIGATION ────────────────────────────────────────────────────────────────
@@ -550,6 +663,7 @@ function go(n) {
   }
   if (n === 'cal') setTimeout(renderCalendar, 50);
   if (n === 'cfg' || n === 'post') setTimeout(renderPostGrid, 50);
+  if (n === 'cfg') setTimeout(updateApiKeyStatus, 50);
   if (n === 'dm') setTimeout(renderDmList, 50);
 }
 
@@ -704,24 +818,40 @@ function sendDmReply() {
 var aiReplyText = '';
 async function genAiReply() {
   var dm = DM_DATA.find(function(d){ return d.id === currentDmId; });
-  if (!dm) return;
+  if (!dm) { showToast('DMを選択してください'); return; }
   var lastMsg = dm.messages.filter(function(m){ return m.from === 'user'; }).pop();
-  if (!lastMsg) return;
+  if (!lastMsg) { showToast('ユーザーからのメッセージがありません'); return; }
   var replyBox = document.getElementById('dm-ai-reply');
   replyBox.style.display = 'block';
-  replyBox.textContent = '生成中...';
-  var prompt = 'あなたは風俗店舗の求人担当スタッフです。\n以下の見込み客からのDMに対して、応募につながる返信文を150文字以内で生成してください。\n親しみやすい口調、相手の不安に共感、次のアクションに誘導。\n返信文のみ出力してください。\n\n【DM】\n' + lastMsg.text;
+  replyBox.textContent = '⏳ AIが返信文を生成中...';
+  aiReplyText = '';
+  var prompt = 'あなたは風俗店舗（デリバリーヘルス）の求人担当スタッフです。\n以下の見込み客からのDMに対して、応募につながる返信文を日本語で生成してください。\n\n【受信したDM】\n' + lastMsg.text + '\n\n【条件】\n- 150文字以内\n- 親しみやすい口調\n- 相手の不安や疑問に共感してから回答する\n- 次のアクション（体験入店・LINE登録など）に誘導する\n- 返信文のみ出力、前置き不要';
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})
+    var res = await fetch('/api/claude', {
+      method:'POST',
+      headers:getApiHeaders(),
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
-    aiReplyText = data.content?.[0]?.text || '生成に失敗しました';
-    replyBox.textContent = aiReplyText;
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : null;
+    if (text) {
+      aiReplyText = text;
+      replyBox.textContent = aiReplyText;
+    } else {
+      throw new Error('empty response');
+    }
   } catch(e) {
-    aiReplyText = '生成に失敗しました';
+    // フォールバック返信
+    var fallbackMap = {
+      'd1': 'はじめまして！当日体験も大丈夫ですよ。顔出しは不要です。まずはお気軽にお話しましょう',
+      'd2': '未経験の方で月60〜80万円稼いでいる子が多いです。詳しくはLINEでお話できますか？',
+      'd3': '週2〜3日でも全然OKです！副業の方も多く在籍していますよ。ぜひ一度話を聞いてみてください',
+      'd6': '不安な気持ち、すごくわかります。うちのスタッフも最初はそうでした。まず話だけでも聞いてみませんか？'
+    };
+    aiReplyText = fallbackMap[currentDmId] || 'はじめまして！お気軽にご質問ください。丁寧にサポートします。';
     replyBox.textContent = aiReplyText;
+    showToast('デモ用サンプル返信を表示しています');
   }
 }
 
@@ -757,20 +887,41 @@ async function doGen() {
   document.getElementById('gen-loading').style.display = 'flex';
   var ta = document.getElementById('gen-ta'); ta.value = '';
   var kwText = kw ? 'キーワード：' + kw + '\n\n' : '';
+  var emojiEl = document.getElementById('emoji-tog');
+  var longEl = document.getElementById('long-tog');
+  var useEmoji = emojiEl ? emojiEl.classList.contains('on') : true;
+  var longMode = longEl ? longEl.classList.contains('on') : false;
+  var lenRule = longMode ? '- 400文字以上の長文で生成すること（改行を多用して読みやすく）\n' : '- 200〜280文字程度\n';
+  var emojiRule = useEmoji ? '- 絵文字を3〜5個使って華やかにする\n' : '- 絵文字は一切使わない（テキストのみ）\n';
   var prompt = 'あなたは風俗店舗の求人担当スタッフです。\nX（Twitter）の求人投稿文を1つ生成してください。\n\nテンプレ：' + curTmpl + '\n' + kwText +
-    '条件：\n- 280文字以内\n- 親しみやすい口調\n- ハッシュタグを3〜5個含める\n- 凍結リスクの高い単語は使わない\n- 投稿文のみ出力、説明や前置きは不要';
+    '必須条件：\n' + lenRule + emojiRule +
+    '- 親しみやすい口調\n- ハッシュタグを3〜5個末尾に含める\n- 凍結リスクの高い単語は使わない\n- 投稿文のみ出力、説明や前置きは絶対に不要';
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    var res = await fetch('/api/claude', {
+      method:'POST', headers:getApiHeaders(),
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})
     });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
-    var text = data.content?.[0]?.text || POSTS[curTmpl] || '';
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : null;
+    if (!text) throw new Error('empty response');
     document.getElementById('gen-loading').style.display = 'none';
     ta.value = text; updPct();
   } catch(e) {
+    // API失敗時：フォールバックをトグル状態に合わせて調整
     document.getElementById('gen-loading').style.display = 'none';
-    ta.value = POSTS[curTmpl] || ''; updPct();
+    var base = POSTS[curTmpl] || '';
+    if (longMode) {
+      base = base + '\n\n' + base.split('\n')[0] + 'ので、ぜひ一度お話しましょう。スタッフ一同お待ちしております！まずはお気軽にDMください。見学だけでも大丈夫ですよ。';
+    }
+    if (!useEmoji) {
+      // 絵文字を除去
+      base = base.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}]/gu, '').replace(/\s+/g, ' ').trim();
+    } else if (!base.match(/[\u{1F300}-\u{1F9FF}]/gu)) {
+      base = '\u2728 ' + base;
+    }
+    ta.value = base; updPct();
+    showToast('AI接続エラー。サンプル文を表示しています');
   }
   bldConf();
   btn.disabled = false; btn.textContent = 'AIで投稿文を生成する';
@@ -779,23 +930,44 @@ async function doGen() {
 async function adjTone(tone) {
   var ta = document.getElementById('gen-ta');
   var base = ta.value || POSTS[curTmpl] || '';
+  if (!base) { showToast('先に投稿文を生成してください'); return; }
   var instrMap = {more:'もっと過激で煽り強く',trust:'優しく安心感ある表現に',urgent:'緊急感と限定感を強調',soft:'短くシンプルに'};
-  document.getElementById('gen-loading').style.display = 'flex';
+  var instr = instrMap[tone];
+  var loadEl = document.getElementById('gen-loading');
+  loadEl.style.display = 'flex';
+  var prompt = '以下の投稿文を「' + instr + '」に修正してください。280文字以内。投稿文のみ出力してください。説明不要。\n\n' + base;
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:'以下の投稿文を「'+instrMap[tone]+'」に修正してください。280文字以内。投稿文のみ出力。\n\n'+base}]})
+    var res = await fetch('/api/claude', {
+      method:'POST',
+      headers:getApiHeaders(),
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})
     });
+    if (!res.ok) throw new Error('API error: ' + res.status);
     var data = await res.json();
-    document.getElementById('gen-loading').style.display = 'none';
-    ta.value = data.content?.[0]?.text || base; updPct();
-  } catch(e) { document.getElementById('gen-loading').style.display = 'none'; }
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : null;
+    loadEl.style.display = 'none';
+    if (text) { ta.value = text; updPct(); showToast('トーンを変更しました'); }
+    else { showToast('生成に失敗しました'); }
+  } catch(e) {
+    loadEl.style.display = 'none';
+    // フォールバック: ローカルで変換
+    var fallbacks = {
+      more: base + '\n\n今すぐDMください！チャンスを逃さないで！',
+      trust: '\n安心してください。' + base,
+      urgent: '【本日限定】' + base,
+      soft: base.split('\n')[0]
+    };
+    ta.value = fallbacks[tone] || base;
+    updPct();
+    showToast('AI接続エラー。ローカルで調整しました');
+  }
 }
 
 function updPct() {
   var ta = document.getElementById('gen-ta');
   var el = document.getElementById('pct');
-  if (ta && el) el.textContent = (ta.value.replace(/\n/g,'').length) + ' / 280';
+  if (ta && el) var longM = document.getElementById('long-tog') && document.getElementById('long-tog').classList.contains('on');
+  if (ta && el) el.textContent = (ta.value.replace(/\n/g,'').length) + (longM ? ' / 500' : ' / 280');
 }
 
 function doPost() {
@@ -935,7 +1107,7 @@ async function genHashtags(){
   document.getElementById('ht-loading').style.display='block';document.getElementById('ht-result').style.display='none';
   var prompt='風俗店舗（'+genre+'・'+area+'）のX(Twitter)投稿に使う効果的なハッシュタグを10個生成してください。求人応募者を集めることが目的です。フォロワーが増えやすく凍結リスクが低い表現にしてください。ハッシュタグのみを改行区切りで出力。前置き不要。';
   try{
-    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})});
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:getApiHeaders(),body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})});
     var data=await res.json();
     document.getElementById('ht-loading').style.display='none';document.getElementById('ht-result').style.display='block';
     document.getElementById('ht-tags').textContent=data.content?.[0]?.text||'生成に失敗しました';
@@ -979,7 +1151,155 @@ document.addEventListener('DOMContentLoaded',function(){
   renderPostGrid();
   renderDmList();
   renderCalendar();
+  updateApiKeyStatus();
 });
+
+// ── STORE TEMPLATES ──────────────────────────────────────────────────────────
+var STORE_TMPLS = {
+  basic: {
+    label: '基本テンプレ',
+    keywords: '新宿・体験入店OK・日払い・未経験歓迎・送迎あり',
+    desc: '新宿エリア・体験入店OK・日払い・未経験歓迎・送迎ありの基本情報を含めます'
+  },
+  luxury: {
+    label: '高級店向け',
+    keywords: '完全会員制・高級感・プライバシー配慮・高収入・選べるコース',
+    desc: '高級感・プライバシー・選べるコースなど上質な店舗イメージを打ち出します'
+  },
+  beginner: {
+    label: '未経験特化',
+    keywords: '未経験歓迎・研修充実・スタッフサポート・怖くない・相談無料',
+    desc: '未経験者の不安を解消するキーワードで安心感を最大化します'
+  },
+  parttime: {
+    label: '副業・WワークOK',
+    keywords: '週1〜OK・Wワーク歓迎・時間自由・副業・バレない・自分のペースで',
+    desc: '週1〜・Wワーク・時間自由など副業希望者に響くキーワードを含めます'
+  }
+};
+
+var selectedStoreTmpl = null;
+
+function applyStoreTmpl(key) {
+  var tmpl = STORE_TMPLS[key];
+  if (!tmpl) return;
+  selectedStoreTmpl = key;
+  // キーワード入力欄に反映
+  var kwInput = document.getElementById('kw-input');
+  if (kwInput) kwInput.value = tmpl.keywords;
+  // プレビュー表示
+  var preview = document.getElementById('store-tmpl-preview');
+  if (preview) {
+    preview.style.display = 'block';
+    preview.textContent = '【' + tmpl.label + '】 ' + tmpl.desc;
+  }
+  // ボタンのハイライト
+  document.querySelectorAll('#store-tmpl-area .bsm').forEach(function(b){ b.style.borderColor=''; b.style.color=''; });
+  event.target.style.borderColor = 'var(--pkb)';
+  event.target.style.color = 'var(--pk2)';
+  showToast(tmpl.label + 'を適用しました');
+}
+
+
+// ── CALENDAR AI GENERATION ────────────────────────────────────────────────────
+async function calGenAI() {
+  var tmpl = document.getElementById('m-tmpl').value;
+  var btn = document.getElementById('cal-ai-btn');
+  btn.disabled = true; btn.textContent = '生成中...';
+  var prompt = 'あなたは風俗店舗の求人担当スタッフです。\nX（Twitter）の求人投稿文を1つ生成してください。\n\nテンプレ：' + tmpl + '\n\n条件：\n- 200〜280文字程度\n- 絵文字を2〜3個使う\n- 親しみやすい口調\n- ハッシュタグを3〜5個含める\n- 凍結リスクの高い単語は使わない\n- 投稿文のみ出力、前置き不要';
+  try {
+    var res = await fetch('/api/claude', {
+      method:'POST',
+      headers:getApiHeaders(),
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:prompt}]})
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : null;
+    if (text) {
+      document.getElementById('m-text').value = text;
+      showToast('AIで投稿文を生成しました');
+    } else throw new Error('empty');
+  } catch(e) {
+    // フォールバック
+    var fallbacks = {
+      '女の子紹介': '本日のおすすめキャスト！笑顔がとびきりかわいい20代の子が出勤中です。話しやすくて癒し系で、リピーターさんに大人気！体験入店も随時受付しています。気になる方はお気軽にDMくださいね。#新宿 #未経験歓迎 #高収入',
+      '稼げる訴求': '実際いくら稼げるの？先月の実績を公開します！21歳・未経験スタート→月78万円。25歳・主婦の方→月55万円。未経験でも初月からしっかり稼げます。詳しくはDMでお話しましょう！#高収入 #未経験OK #夜職',
+      '求人募集': '【急募】スタッフ大募集中！日払い・週払いOK / 未経験・副業・Wワーク大歓迎 / 保証制度あり / 今なら入店特典プレゼント！少しでも気になったらすぐDMを。お待ちしています。#急募 #日払い #未経験歓迎',
+      '体験入店': '体験入店随時受付中！初めての方も安心してください。当日の流れを丁寧にご説明します。送迎あり・即日体験OK・強制なし・見学だけでもOK！まずはDMでご連絡を。#体験入店 #未経験歓迎 #安心'
+    };
+    var text = fallbacks[tmpl] || fallbacks['女の子紹介'];
+    document.getElementById('m-text').value = text;
+    showToast('デモ用サンプルを表示しています');
+  }
+  btn.disabled = false; btn.textContent = 'AIで生成';
+}
+
+
+function toggleBtn(el) { el.classList.toggle('on'); }
+
+// ── API KEY MANAGEMENT ────────────────────────────────────────────────────────
+var API_KEY_STORAGE = 'noctis_api_key';
+
+function loadApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE) || '';
+}
+
+function saveApiKey() {
+  var key = (document.getElementById('api-key-input').value || '').trim();
+  if (!key) { showToast('APIキーを入力してください'); return; }
+  if (!key.startsWith('sk-ant-')) { showToast('正しいClaude APIキーを入力してください（sk-ant-で始まる）'); return; }
+  localStorage.setItem(API_KEY_STORAGE, key);
+  updateApiKeyStatus();
+  showToast('APIキーを保存しました');
+}
+
+function updateApiKeyStatus() {
+  var key = loadApiKey();
+  var status = document.getElementById('api-key-status');
+  var input = document.getElementById('api-key-input');
+  if (status) {
+    if (key) {
+      status.textContent = '✓ APIキー設定済み（' + key.slice(0,12) + '...）';
+      status.style.color = 'var(--gn)';
+    } else {
+      status.textContent = 'APIキー未設定 — 設定するとAI機能が使えます';
+      status.style.color = 'var(--txt3)';
+    }
+  }
+  if (input && key) input.value = key.slice(0,12) + '...';
+}
+
+function getApiHeaders() {
+  var key = loadApiKey();
+  return {
+    'Content-Type': 'application/json',
+    'x-api-key': key,
+    'anthropic-version': '2023-06-01',
+  };
+}
+
+// ── VIEW TOGGLE (PC only) ─────────────────────────────────────────────────────
+function setView(mode) {
+  var wrap = document.getElementById('desktop-wrap');
+  var btnPhone = document.getElementById('btn-phone');
+  var btnFull = document.getElementById('btn-full');
+  if (mode === 'full') {
+    wrap.style.width = '100vw';
+    wrap.style.height = '100vh';
+    wrap.style.borderRadius = '0';
+    wrap.style.boxShadow = 'none';
+    if (btnPhone) btnPhone.classList.remove('active');
+    if (btnFull) btnFull.classList.add('active');
+  } else {
+    wrap.style.width = '393px';
+    wrap.style.height = '852px';
+    wrap.style.borderRadius = '44px';
+    wrap.style.boxShadow = '0 0 0 10px #1A1828, 0 0 0 11px #2A2840, 0 40px 80px rgba(0,0,0,0.8)';
+    if (btnPhone) btnPhone.classList.add('active');
+    if (btnFull) btnFull.classList.remove('active');
+  }
+}
 </script>
 </body>
 </html>
