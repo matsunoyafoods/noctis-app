@@ -2,1479 +2,984 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>NOCTIS — 夜職求人 SNS AI Manager</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NOCTIS — 求人ブランディングAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#08060F;--bg2:#100A18;--card:#160E22;--card2:#1E1430;
-  --blue:#FF4D8D;--blue2:#FF85B3;--bd:rgba(255,77,141,0.15);--bb:rgba(255,77,141,0.4);
-  --green:#2ECC71;--gnd:rgba(46,204,113,0.16);--gnb:rgba(46,204,113,0.45);
-  --red:#FF5252;--rdd:rgba(255,82,82,0.16);--rdb:rgba(255,82,82,0.45);
-  --gold:#C9A84C;--gld:rgba(201,168,76,0.12);--glb:rgba(201,168,76,0.4);
-  --cyan:#C9A84C;--cyd:rgba(201,168,76,0.12);--cyb:rgba(201,168,76,0.4);
+  --bg:#080610;--card:#12101E;--card2:#1A1828;--card3:#201E30;
+  --pk:#FF4D8D;--pk2:#FF85B3;--pkd:rgba(255,77,141,0.15);--pkb:rgba(255,77,141,0.4);
+  --gd:#C9A84C;--gd2:#FFD700;--gdd:rgba(201,168,76,0.13);--gdb:rgba(201,168,76,0.4);
+  --gn:#2ECC71;--gnd:rgba(46,204,113,0.13);--gnb:rgba(46,204,113,0.4);
+  --rd:#FF5252;--rdd:rgba(255,82,82,0.13);--rdb:rgba(255,82,82,0.4);
+  --bl:#4D9FFF;--bld:rgba(77,159,255,0.13);--blb:rgba(77,159,255,0.4);
   --txt:#FFFFFF;--txt2:#C8D0E8;--txt3:#8892B0;
-  --bdr:rgba(255,255,255,0.12);--bdr2:rgba(255,255,255,0.22);
-  --r:13px;--rsm:9px;--font:'Noto Sans JP',sans-serif;--mono:'Share Tech Mono',monospace;
+  --bdr:rgba(255,255,255,0.08);--bdr2:rgba(255,255,255,0.15);
+  --r:12px;--rsm:8px;
+  --font:'Noto Sans JP',sans-serif;--mono:'DM Mono',monospace;
 }
-html,body{height:100%;background:#03040A;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:22px}
-@media(max-width:700px){
-  html,body{
-    background:var(--bg)!important;
-    display:block!important;
-    width:100%!important;
-    height:100%!important;
-    overflow:hidden!important;
-    padding:0!important;
-    gap:0!important;
-  }
-  #panel{display:none!important}
-  #frame{
-    width:100vw!important;
-    height:100vh!important;
-    height:100dvh!important;
-    border-radius:0!important;
-    border:none!important;
-    box-shadow:none!important;
-    position:fixed!important;
-    top:0!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    margin:0!important;
-  }
-  .sb{padding-bottom:90px!important}
-}
-#panel{background:var(--card);border:0.5px solid var(--bdr2);border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;gap:3px;min-width:142px;flex-shrink:0;margin-top:4px}
-#panel h3{font-size:9px;letter-spacing:.13em;color:var(--txt3);text-transform:uppercase;padding-bottom:9px;border-bottom:0.5px solid var(--bdr);margin-bottom:3px}
-.pb{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:transparent;border:0.5px solid transparent;color:var(--txt3);font-size:11px;cursor:pointer;transition:.14s;text-align:left;white-space:nowrap;width:100%}
-.pb:hover{background:var(--bd);color:var(--blue2);border-color:var(--bb)}
-.pb.on{background:var(--bd);color:var(--blue2);border-color:var(--bb);font-weight:500}
-.pi{font-size:13px}
-#frame{width:375px;height:780px;background:var(--bg);border-radius:36px;overflow:hidden;position:relative;flex-shrink:0;border:1.5px solid rgba(59,130,246,0.2);box-shadow:0 0 0 1px rgba(255,255,255,0.03),0 32px 64px rgba(0,0,0,0.8),0 0 40px rgba(59,130,246,0.05)}
-.sc{display:none;height:100%;flex-direction:column;overflow:hidden}
+html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-family:var(--font)}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+.sc{display:none;flex-direction:column;height:100%;overflow:hidden}
 .sc.on{display:flex}
-.sb{flex:1;overflow-y:auto;padding-bottom:76px}
+.hdr{flex-shrink:0;padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--bdr);background:rgba(8,6,16,0.97)}
+.logo{font-size:18px;font-weight:700;letter-spacing:.1em;color:var(--gd2);font-family:var(--mono)}
+.logo-s{font-size:10px;color:var(--txt3);letter-spacing:.06em}
+.htitle{font-size:16px;font-weight:700;color:var(--txt)}
+.bk{background:none;border:none;color:var(--pk2);font-size:22px;cursor:pointer;padding:4px 8px 4px 0;line-height:1}
+.sb{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:80px}
 .sb::-webkit-scrollbar{display:none}
-.hdr{padding:15px 17px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--bdr);background:rgba(6,8,16,.97);flex-shrink:0}
-.logo{font-size:18px;font-weight:700;letter-spacing:.1em;color:#FFD700;font-family:var(--mono)}
-.logo-s{font-size:11px;color:#8892B0;letter-spacing:.06em;margin-top:2px}
-.htitle{font-size:17px;font-weight:700;color:#FFFFFF}
-.bk{background:none;border:none;color:var(--blue2);font-size:19px;cursor:pointer;padding:2px 6px 2px 0}
-.nav{position:absolute;bottom:0;left:0;right:0;background:rgba(8,10,20,.97);border-top:0.5px solid var(--bdr);display:flex;padding:6px 0 16px;z-index:30}
-.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:4px 2px}
-.ni .ic{font-size:17px;line-height:1}
-.ni .lb{font-size:11px;color:#8892B0}
-.ni.on .lb{color:#FFD700;font-weight:600}
-.npc{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer}
-.npc-c{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FF4D8D,#C9A84C);display:flex;align-items:center;justify-content:center;font-size:20px;margin-top:-14px;border:2px solid var(--bg);box-shadow:0 0 16px rgba(59,130,246,0.4)}
-.npc .lb{font-size:11px;color:#8892B0}
-.npc.on .lb{color:var(--blue2)}
-.ct{padding:13px 16px}
-.sec{font-size:12px;letter-spacing:.1em;color:#FF85B3;text-transform:uppercase;margin-bottom:12px;font-weight:600;border-left:3px solid #FF4D8D;padding-left:8px}
-.dv{height:0.5px;background:var(--bdr);margin:12px 0}
+.ct{padding:14px 16px}
+.nav{flex-shrink:0;background:rgba(8,6,16,0.97);border-top:0.5px solid var(--bdr);display:flex;align-items:center;padding:6px 0 max(16px,env(safe-area-inset-bottom));z-index:10}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:6px 2px;font-family:var(--font)}
+.ni .lb{font-size:10px;color:var(--txt3);transition:.15s}
+.ni.on .lb{color:var(--pk2);font-weight:600}
+.npc{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:var(--font)}
+.npc-c{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--pk),var(--gd));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;margin-top:-16px;border:2px solid var(--bg);box-shadow:0 0 20px rgba(255,77,141,0.4)}
+.npc .lb{font-size:10px;color:var(--txt3)}
+.npc.on .lb{color:var(--pk2)}
+.sec{font-size:11px;letter-spacing:.08em;color:var(--pk2);margin-bottom:10px;font-weight:600;border-left:3px solid var(--pk);padding-left:8px;text-transform:uppercase}
 .card{background:var(--card);border:1px solid var(--bdr2);border-radius:var(--r);padding:14px;margin-bottom:12px}
-.cblue{background:var(--bd);border-color:var(--bb)}
-.cgreen{background:var(--gnd);border-color:var(--gnb)}
-.cred{background:var(--rdd);border-color:var(--rdb)}
-.cgold{background:var(--gld);border-color:var(--glb)}
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.sc2{background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--rsm);padding:13px 11px;position:relative;overflow:hidden}
-.sl{font-size:12px;color:var(--txt3);margin-bottom:5px;letter-spacing:.04em;font-weight:500}
-.sv{font-size:24px;font-weight:700;color:#FFFFFF;line-height:1}
-.su{font-size:11px;font-weight:400;color:var(--txt2)}
-.sch{font-size:12px;margin-top:5px;font-weight:500}
-.sch.up{color:#2ECC71}
-.sch.dn{color:#FF5252}
-.sico{position:absolute;bottom:2px;right:6px;font-size:20px;opacity:.08}
-.aa{display:flex;align-items:center;gap:12px;padding:13px 14px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:var(--rsm);margin-bottom:8px;cursor:pointer;transition:.14s}
-.aa:active{opacity:.75}
-.aa-i{font-size:15px;flex-shrink:0}
-.aa-t{font-size:14px;font-weight:600;color:#FFFFFF}
-.aa-s{font-size:12px;color:#8892B0;margin-top:3px}
-.aa-a{color:#FFD700;font-size:18px;font-weight:700}
-.sit{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:0.5px solid var(--bdr)}
-.stt{font-size:12px;color:var(--cyan);font-weight:500;white-space:nowrap;min-width:38px;font-family:var(--mono)}
-.stx{font-size:13px;color:#C8D0E8;line-height:1.6;flex:1}
-.stg{font-size:10px;padding:3px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0;font-weight:500}
-.tg-b{background:var(--bd);color:var(--blue2);border:0.5px solid var(--bb)}
-.tg-g{background:var(--gnd);color:var(--green);border:0.5px solid var(--gnb)}
-.tg-r{background:var(--rdd);color:var(--red);border:0.5px solid var(--rdb)}
-.tg-gd{background:var(--gld);color:var(--gold);border:0.5px solid var(--glb)}
-.mpr{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--bdr)}
-.mpl{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--txt)}
-.mst{font-size:10px;padding:2px 8px;border-radius:8px}
-.ms-ok{background:var(--gnd);color:var(--green);border:0.5px solid var(--gnb)}
-.ms-w{background:var(--bd);color:var(--blue2);border:0.5px solid var(--bb)}
-.ms-e{background:var(--rdd);color:var(--red);border:0.5px solid var(--rdb)}
-
-/* ACCOUNT GRID */
-.acgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.accard{background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm);padding:11px 10px;cursor:pointer;transition:.14s;position:relative}
-.accard.sel{border-color:var(--blue);background:rgba(59,130,246,0.09)}
-.accard.sel .acchk{display:flex}
-.acchk{position:absolute;top:7px;right:7px;width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:9px;display:none;align-items:center;justify-content:center}
-.ac-ico{font-size:18px;margin-bottom:4px}
-.ac-name{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:2px}
-.ac-handle{font-size:11px;color:var(--txt2);font-family:var(--mono);margin-bottom:3px}
-.ac-fol{font-size:11px;color:var(--cyan)}
-
-/* TEMPLATE CARDS */
-.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.tc{background:var(--card2);border:1px solid rgba(255,255,255,0.12);border-radius:var(--rsm);padding:14px 10px 12px;cursor:pointer;text-align:center;transition:.14s}
-.tc.on{border:2px solid #C9A84C;background:rgba(201,168,76,0.15)}
-.tc-i{font-size:20px;margin-bottom:4px;display:block}
-.tc-n{font-size:14px;font-weight:600;color:#FFFFFF}
-.tc-d{font-size:12px;color:#8892B0;margin-top:3px}
-
-/* BUTTONS */
-.btn{width:100%;padding:14px;border:none;border-radius:var(--rsm);background:linear-gradient(135deg,#FF4D8D,#C9A84C);color:#FFFFFF;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:.14s;font-family:var(--font);box-shadow:0 4px 20px rgba(255,77,141,0.35)}
+.dv{height:0.5px;background:var(--bdr);margin:14px 0}
+.sinp{width:100%;padding:11px 13px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:var(--rsm);color:var(--txt);font-size:14px;outline:none;font-family:var(--font)}
+.sinp:focus{border-color:var(--pk)}
+.btn{width:100%;padding:14px;border:none;border-radius:var(--rsm);background:linear-gradient(135deg,var(--pk),var(--gd));color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 4px 18px rgba(255,77,141,0.3);transition:.15s}
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.5}
-.btn-red{background:linear-gradient(135deg,var(--red),#7F1D1D)}
-.bsm{padding:8px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.22);border-radius:var(--rsm);color:#FFFFFF;font-size:13px;cursor:pointer}
-.btn-tone{padding:8px 13px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.2);border-radius:16px;color:#C8D0E8;font-size:12px;cursor:pointer;transition:.14s;white-space:nowrap;font-weight:500}
-.btn-tone:hover{border-color:#FF85B3;color:#FFD700;background:rgba(201,168,76,0.12)}
-.brow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}
-.bcpy{display:flex;align-items:center;gap:4px;padding:6px 11px;background:var(--cyd);border:0.5px solid var(--cyb);border-radius:7px;color:var(--cyan);font-size:10px;cursor:pointer;transition:.14s}
-.bcpy.dn{background:rgba(6,182,212,0.22)}
-
-/* POST PREVIEW */
-.ppv{background:var(--card2);border:1px solid rgba(255,255,255,0.18);border-radius:var(--rsm);padding:16px;margin-bottom:12px;font-size:14px;line-height:2.0;color:#FFFFFF;min-height:110px;position:relative;white-space:pre-line}
-.pc{position:absolute;bottom:7px;right:10px;font-size:11px;color:#8892B0;font-family:var(--mono)}
-.ngok{display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;background:rgba(46,204,113,0.15);border:1px solid rgba(46,204,113,0.5);color:#2ECC71;font-weight:500}
-.ngwn{display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;background:rgba(255,82,82,0.15);border:1px solid rgba(255,82,82,0.5);color:#FF5252;font-weight:500}
-.spin{animation:sp 1s linear infinite;display:inline-block}
-@keyframes sp{to{transform:rotate(360deg)}}
-.pls{animation:pl 1.4s ease-in-out infinite}
-@keyframes pl{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
-
-/* BARS */
-.br2{display:flex;align-items:center;gap:7px;margin-bottom:7px}
-.blb{font-size:13px;color:#C8D0E8;min-width:66px;font-weight:500}
-.btr{flex:1;height:6px;background:var(--card2);border-radius:3px;overflow:hidden}
-.bfl{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--blue2))}
-.bfl.g{background:linear-gradient(90deg,var(--green),#4ADE80)}
-.bfl.r{background:linear-gradient(90deg,var(--red),#F87171)}
-.bfl.gd{background:linear-gradient(90deg,var(--gold),#FCD34D)}
-.bpc{font-size:13px;color:#FFFFFF;min-width:32px;text-align:right;font-weight:600}
-
-/* CALENDAR */
-.calgr{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:11px}
-.cdl{font-size:9px;color:var(--txt3);text-align:center;padding:3px 0}
-.cd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:11px;color:var(--txt2);cursor:pointer;position:relative}
-.cd.has{background:var(--bd);color:var(--blue2);font-weight:500}
-.cd.today{background:var(--blue);color:#fff;font-weight:700}
+.bsm{padding:9px 14px;background:rgba(255,255,255,0.06);border:1px solid var(--bdr2);border-radius:var(--rsm);color:var(--txt);font-size:13px;cursor:pointer;font-family:var(--font);transition:.15s}
+.btn-tone{padding:8px 13px;background:rgba(255,255,255,0.06);border:1px solid var(--bdr2);border-radius:16px;color:var(--txt2);font-size:12px;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.brow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.plb{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;background:var(--pkd);border:1px solid var(--pkb);border-radius:16px;font-size:12px;color:var(--pk2);margin-bottom:14px;font-weight:600}
+.aa{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--pkd);border:1px solid var(--pkb);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:.15s}
+.aa-t{font-size:14px;font-weight:600;color:var(--txt)}
+.aa-s{font-size:12px;color:var(--txt3);margin-top:3px}
+.aa-a{color:var(--pk2);font-size:20px}
+.stg{font-size:10px;padding:3px 8px;border-radius:8px;white-space:nowrap;font-weight:500}
+.tg-g{background:var(--gnd);color:var(--gn);border:1px solid var(--gnb)}
+.tg-p{background:var(--pkd);color:var(--pk2);border:1px solid var(--pkb)}
+.tg-gd{background:var(--gdd);color:var(--gd2);border:1px solid var(--gdb)}
+.tg-b{background:var(--bld);color:var(--bl);border:1px solid var(--blb)}
+.tg-r{background:var(--rdd);color:var(--rd);border:1px solid var(--rdb)}
+.sit{display:flex;align-items:flex-start;gap:9px;padding:10px 0;border-bottom:0.5px solid var(--bdr)}
+.stt{font-size:11px;color:var(--gd2);font-weight:500;white-space:nowrap;min-width:36px;font-family:var(--mono)}
+.stx{font-size:12px;color:var(--txt2);line-height:1.6;flex:1}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sc2{background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--rsm);padding:13px 11px}
+.sl{font-size:11px;color:var(--txt3);margin-bottom:5px;font-weight:500}
+.sv{font-size:22px;font-weight:700;color:var(--txt);font-family:var(--mono)}
+.su{font-size:12px;font-weight:400;color:var(--txt3)}
+.sch{font-size:11px;margin-top:4px;font-weight:500}
+.sch.up{color:var(--gn)}
+.sch.dn{color:var(--rd)}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.tc{background:var(--card2);border:1px solid var(--bdr);border-radius:var(--rsm);padding:14px 10px;cursor:pointer;text-align:center;transition:.15s}
+.tc.on{border:2px solid var(--pk);background:var(--pkd)}
+.tc-i{font-size:22px;margin-bottom:5px;display:block}
+.tc-n{font-size:13px;font-weight:600;color:var(--txt)}
+.tc-d{font-size:11px;color:var(--txt3);margin-top:2px}
+.srow{padding:11px 0;border-bottom:0.5px solid var(--bdr)}
+.srl{font-size:12px;color:var(--txt2);margin-bottom:5px;font-weight:500}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--bdr)}
+.tn{font-size:14px;color:var(--txt);font-weight:500}
+.ts{font-size:12px;color:var(--txt3);margin-top:3px}
+.tog{width:44px;height:26px;background:rgba(255,255,255,0.15);border-radius:13px;cursor:pointer;position:relative;border:none;transition:background .2s;flex-shrink:0}
+.tog.on{background:var(--pk)}
+.tog-t{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s}
+.tog.on .tog-t{left:21px}
+.br2{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.blb{font-size:12px;color:var(--txt2);min-width:62px;font-weight:500}
+.btr{flex:1;height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden}
+.bfl{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--pk),var(--pk2))}
+.bfl.g{background:linear-gradient(90deg,var(--gn),#4ADE80)}
+.bpc{font-size:12px;color:var(--txt);min-width:28px;text-align:right;font-weight:600;font-family:var(--mono)}
+.ngok{display:flex;align-items:center;gap:7px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;background:var(--gnd);border:1px solid var(--gnb);color:var(--gn);font-weight:500}
+.dmc{background:var(--card2);border:1px solid var(--bdr);border-radius:var(--rsm);padding:13px;margin-bottom:10px}
+.dmt{font-size:11px;color:var(--gd2);letter-spacing:.04em;margin-bottom:6px;display:block;font-weight:600}
+.dmx{font-size:13px;color:var(--txt2);line-height:1.8;margin-bottom:10px}
+.calgr{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px}
+.cdl{font-size:10px;color:var(--txt3);text-align:center;padding:4px 0;font-weight:500}
+.cd{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;font-size:12px;color:var(--txt2);cursor:pointer;position:relative}
+.cd.has{background:var(--pkd);color:var(--pk2);font-weight:600}
+.cd.today{background:var(--pk);color:#fff;font-weight:700}
 .cd.oth{color:var(--txt3)}
-.cdot{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:var(--green)}
-
-/* PNL TICKER */
-.ticker{background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm);padding:10px 12px;margin-bottom:10px;overflow:hidden}
-.tick-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--bdr)}
-.tick-pair{font-size:11px;font-weight:600;color:var(--txt);font-family:var(--mono)}
-.tick-pnl{font-size:12px;font-weight:700;font-family:var(--mono)}
-.tick-up{color:var(--green)}
-.tick-dn{color:var(--red)}
-
-/* SETTINGS */
-.srow{padding:10px 0;border-bottom:0.5px solid var(--bdr)}
-.srl{font-size:13px;color:#C8D0E8;margin-bottom:6px;font-weight:500}
-.sinp{width:100%;padding:11px 13px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#FFFFFF;font-size:15px;outline:none;font-family:var(--font)}
-.sinp:focus{border-color:#FF85B3;background:rgba(201,168,76,0.08)}
-.trow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--bdr)}
-.tn{font-size:15px;color:#FFFFFF;font-weight:500}
-.ts{font-size:12px;color:#8892B0;margin-top:3px}
-.tog{width:38px;height:21px;background:var(--card2);border:0.5px solid var(--bdr);border-radius:11px;cursor:pointer;position:relative;transition:.2s;flex-shrink:0}
-.tog.on{background:var(--blue);border-color:var(--blue)}
-.tog-t{position:absolute;top:3px;left:3px;width:13px;height:13px;border-radius:50%;background:#fff;transition:.2s}
-.tog.on .tog-t{left:20px}
-.plb{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(201,168,76,0.18);border:1px solid rgba(77,150,255,0.5);border-radius:16px;font-size:12px;color:#FFD700;margin-bottom:14px;font-weight:600}
-
-/* DM */
-.dmc{background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm);padding:11px;margin-bottom:8px}
-.dmt{font-size:12px;color:#00D4FF;letter-spacing:.04em;margin-bottom:6px;display:block;font-weight:600}
-.dmx{font-size:14px;color:#C8D0E8;line-height:1.85;margin-bottom:10px}
-
-/* ONBOARD */
-.obw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;overflow-y:auto}
-.ob-chart{display:flex;align-items:flex-end;gap:3px;height:60px;margin-bottom:20px;justify-content:center}
-.ob-bar{width:12px;border-radius:2px 2px 0 0;background:linear-gradient(180deg,var(--green),#064E3B)}
-.obl{font-size:30px;font-weight:700;color:var(--blue2);letter-spacing:.1em;font-family:var(--mono);margin-bottom:2px}
-.obt{font-size:9px;color:var(--txt3);letter-spacing:.16em;margin-bottom:30px}
-.obtt{font-size:20px;font-weight:700;color:var(--txt);line-height:1.45;margin-bottom:9px}
-.obds{font-size:14px;color:var(--txt);line-height:1.9;margin-bottom:26px}
-.fl{text-align:left;width:100%;margin-bottom:26px}
-.fi{display:flex;align-items:center;gap:9px;padding:7px 0;font-size:13px;color:var(--txt)}
-.fd{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0}
-
-/* CHART */
-.chartv{display:flex;align-items:flex-end;gap:4px;height:62px;margin-bottom:2px}
-.chc{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
-.chb{width:100%;border-radius:2px 2px 0 0;background:linear-gradient(180deg,var(--green),#064E3B);min-height:3px}
-.chb.b{background:linear-gradient(180deg,var(--blue),#1E3A8A)}
-.chb.r{background:linear-gradient(180deg,var(--red),#7F1D1D)}
-.chl{font-size:8px;color:var(--txt3);text-align:center}
-
-.done-ico{font-size:44px;text-align:center;margin-bottom:9px}
-.done-t{font-size:17px;font-weight:700;color:var(--green);text-align:center;margin-bottom:6px}
-.done-s{font-size:11px;color:var(--txt3);text-align:center;margin-bottom:20px;line-height:1.7}
-
-/* 10-account list */
-.aclist{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
-.acitem{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm)}
-.acitem-ico{font-size:18px;flex-shrink:0}
-.acitem-info{flex:1}
-.acitem-name{font-size:12px;font-weight:500;color:var(--txt)}
-.acitem-meta{font-size:10px;color:var(--txt3);font-family:var(--mono)}
-.acitem-fol{font-size:10px;color:var(--cyan)}
-.acitem-tog{flex-shrink:0}
-.add-ac{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;background:transparent;border:0.5px dashed var(--bdr2);border-radius:var(--rsm);color:var(--txt3);font-size:12px;cursor:pointer;transition:.14s;width:100%}
-.add-ac:hover{border-color:var(--blue);color:var(--blue2)}
-.ac-count{font-size:12px;color:var(--txt2);margin-bottom:10px}
+.cdot{width:4px;height:4px;border-radius:50%;margin-top:1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.spin{animation:sp 1s linear infinite;display:inline-block}
+/* SNS CONNECT CARDS */
+.sns-card{background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--r);padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.sns-logo{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;font-weight:700}
+.sns-info{flex:1}
+.sns-name{font-size:15px;font-weight:700;color:var(--txt)}
+.sns-handle{font-size:12px;color:var(--txt3);margin-top:2px;font-family:var(--mono)}
+.sns-stat{font-size:12px;color:var(--gd2);margin-top:3px}
+.sns-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.badge-conn{font-size:10px;padding:4px 10px;border-radius:16px;font-weight:600;background:var(--gnd);color:var(--gn);border:1px solid var(--gnb)}
+.badge-disc{font-size:10px;padding:4px 10px;border-radius:16px;font-weight:600;background:rgba(255,255,255,0.06);color:var(--txt3);border:1px solid var(--bdr2)}
+/* DM INBOX */
+.dm-thread{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--card2);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:.15s}
+.dm-thread:active{opacity:.75}
+.dm-thread.unread{border-color:var(--pkb);background:var(--pkd)}
+.dm-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;font-weight:700}
+.dm-info{flex:1;min-width:0}
+.dm-name{font-size:14px;font-weight:600;color:var(--txt)}
+.dm-preview{font-size:12px;color:var(--txt3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.dm-time{font-size:10px;color:var(--txt3);font-family:var(--mono)}
+.dm-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--pk)}
+/* DM DETAIL */
+.msg-bubble{max-width:78%;padding:11px 14px;border-radius:16px;font-size:13px;line-height:1.7;margin-bottom:8px}
+.msg-in{background:var(--card2);border:1px solid var(--bdr2);color:var(--txt);border-bottom-left-radius:4px;align-self:flex-start}
+.msg-out{background:linear-gradient(135deg,var(--pk),var(--gd));color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.msg-time{font-size:10px;color:var(--txt3);margin-bottom:4px;font-family:var(--mono)}
+/* POST CONFIRM */
+.post-dest{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--bdr)}
+.acitem{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--card2);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:8px}
+.acgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.accard{background:var(--card2);border:1px solid var(--bdr);border-radius:var(--rsm);padding:12px 10px;cursor:pointer;transition:.15s;position:relative;text-align:center}
+.accard.sel{border-color:var(--pk);background:var(--pkd)}
+.acchk{position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;background:var(--pk);color:#fff;font-size:9px;display:none;align-items:center;justify-content:center;font-weight:700}
+.accard.sel .acchk{display:flex}
+.ac-ico{font-size:20px;margin-bottom:5px}
+.ac-name{font-size:10px;font-weight:700;color:var(--txt);word-break:break-all}
+.ac-plat{font-size:9px;color:var(--txt3);margin-top:2px}
+/* MODAL */
+.modal-wrap{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.78);z-index:50;align-items:flex-end}
+.modal-box{background:var(--card);border-radius:20px 20px 0 0;padding:20px 18px 34px;width:100%}
+.modal-center{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.78);z-index:51;align-items:center;justify-content:center}
+.modal-box-c{background:var(--card);border-radius:16px;padding:22px 18px;width:80%;text-align:center}
 </style>
 </head>
 <body>
+<div id="app">
 
-<div id="panel">
-  <h3>画面を選ぶ</h3>
-  <button class="pb on" id="pb-ob" onclick="go('ob')"><span class="pi">▶</span> オープニング</button>
-  <button class="pb" id="pb-db" onclick="go('db')"><span class="pi">📊</span> ダッシュボード</button>
-  <button class="pb" id="pb-post" onclick="go('post')"><span class="pi">✍️</span> 投稿作成</button>
-  <button class="pb" id="pb-cal" onclick="go('cal')"><span class="pi">📅</span> カレンダー</button>
-  <button class="pb" id="pb-an" onclick="go('an')"><span class="pi">📈</span> AI分析</button>
-  <button class="pb" id="pb-dm" onclick="go('dm')"><span class="pi">💬</span> DM返信</button>
-  <button class="pb" id="pb-cfg" onclick="go('cfg')"><span class="pi">⚙️</span> 設定</button>
-</div>
-
-<div id="frame">
-
-<!-- ONBOARDING -->
+<!-- ===== ONBOARDING ===== -->
 <div id="sc-ob" class="sc on">
-  <div class="obw">
-    <!-- LOGO AREA -->
-    <div style="margin-bottom:6px">
-      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#FF4D8D,#C9A84C);display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:28px;box-shadow:0 0 30px rgba(255,77,141,0.4)">✦</div>
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;min-height:100%">
+    <div style="width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--pk),var(--gd));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:30px;color:#fff;font-weight:700;box-shadow:0 0 32px rgba(255,77,141,0.45)">N</div>
+    <div style="font-size:36px;font-weight:700;color:var(--gd2);letter-spacing:.1em;font-family:var(--mono);margin-bottom:4px">NOCTIS</div>
+    <div style="font-size:10px;color:var(--txt3);letter-spacing:.22em;margin-bottom:26px">RECRUITMENT AI</div>
+    <div style="font-size:20px;font-weight:700;color:var(--txt);line-height:1.6;margin-bottom:10px">店舗向け<br><span style="color:var(--gd2)">求人ブランディング</span>AI</div>
+    <div style="font-size:13px;color:var(--txt3);line-height:2;margin-bottom:14px">X・Instagram・Threads・Blueskyを<br>一画面で完全管理。</div>
+    <div style="width:100%;margin-bottom:30px">
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--bdr);font-size:13px;color:var(--txt)"><span style="width:28px;height:28px;border-radius:8px;background:var(--pkd);display:flex;align-items:center;justify-content:center;flex-shrink:0">&#128200;</span>投稿を全SNSに一括送信</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--bdr);font-size:13px;color:var(--txt)"><span style="width:28px;height:28px;border-radius:8px;background:var(--pkd);display:flex;align-items:center;justify-content:center;flex-shrink:0">&#128172;</span>DM受信・返信文をAIが生成</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--bdr);font-size:13px;color:var(--txt)"><span style="width:28px;height:28px;border-radius:8px;background:var(--pkd);display:flex;align-items:center;justify-content:center;flex-shrink:0">&#127800;</span>求人テンプレをAIが自動生成</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:9px 0;font-size:13px;color:var(--txt)"><span style="width:28px;height:28px;border-radius:8px;background:var(--pkd);display:flex;align-items:center;justify-content:center;flex-shrink:0">&#128737;</span>凍結防止NGワード自動チェック</div>
     </div>
-    <div style="font-size:32px;font-weight:700;color:#FFD700;letter-spacing:.1em;font-family:'Share Tech Mono',monospace;margin-bottom:2px">NOCTIS</div>
-    <div style="font-size:10px;color:rgba(255,133,179,0.7);letter-spacing:.2em;margin-bottom:10px">RECRUITMENT AI</div>
-
-    <!-- CATCH COPY -->
-    <div style="font-size:22px;font-weight:700;color:#FFFFFF;line-height:1.5;margin-bottom:8px;text-align:center">
-      店舗向け<br><span style="color:#FFD700">求人ブランディング</span>AI
-    </div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.9;margin-bottom:28px;text-align:center">
-      投稿を作るのは<strong style="color:#FF85B3">ワンタップ</strong>。<br>
-      複数SNSに一括配信。<br>
-      応募数をAIで最大化する。
-    </div>
-
-    <!-- FEATURES -->
-    <div style="text-align:left;width:100%;margin-bottom:28px">
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:#FFFFFF;border-bottom:0.5px solid rgba(255,255,255,0.08)">
-        <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,77,141,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🌸</div>
-        女の子紹介・求人テンプレを1タップ生成
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:#FFFFFF;border-bottom:0.5px solid rgba(255,255,255,0.08)">
-        <div style="width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📡</div>
-        X・Threads・Blueskyに一括配信
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:#FFFFFF;border-bottom:0.5px solid rgba(255,255,255,0.08)">
-        <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,77,141,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🛡</div>
-        凍結防止NGワード自動チェック
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;color:#FFFFFF">
-        <div style="width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">💬</div>
-        応募者DMをAIが返信文を即生成
-      </div>
-    </div>
-
-    <!-- BUTTONS -->
-    <button class="btn" onclick="go('cfg')" style="font-size:15px;padding:16px;margin-bottom:10px;background:linear-gradient(135deg,#FF4D8D,#C9A84C)">
-      ✦ 店舗設定をして始める
-    </button>
-    <button onclick="go('db')" style="background:none;border:none;color:rgba(255,255,255,0.45);font-size:12px;cursor:pointer;padding:8px;font-family:inherit">
-      スキップしてダッシュボードへ →
-    </button>
+    <button class="btn" id="ob-start" style="margin-bottom:10px">SNS連携して始める</button>
+    <button id="ob-skip" style="width:100%;padding:13px;border:1px solid var(--bdr2);border-radius:var(--rsm);background:transparent;color:var(--txt3);font-size:13px;cursor:pointer;font-family:var(--font)">スキップしてデモを見る</button>
   </div>
 </div>
 
-<!-- DASHBOARDd>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>NOCTIS — 夜職求人 SNS AI Manager</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#08060F;--bg2:#100A18;--card:#160E22;--card2:#1E1430;
-  --blue:#FF4D8D;--blue2:#FF85B3;--bd:rgba(255,77,141,0.15);--bb:rgba(255,77,141,0.4);
-  --green:#2ECC71;--gnd:rgba(46,204,113,0.16);--gnb:rgba(46,204,113,0.45);
-  --red:#FF5252;--rdd:rgba(255,82,82,0.16);--rdb:rgba(255,82,82,0.45);
-  --gold:#C9A84C;--gld:rgba(201,168,76,0.12);--glb:rgba(201,168,76,0.4);
-  --cyan:#C9A84C;--cyd:rgba(201,168,76,0.12);--cyb:rgba(201,168,76,0.4);
-  --txt:#FFFFFF;--txt2:#C8D0E8;--txt3:#8892B0;
-  --bdr:rgba(255,255,255,0.12);--bdr2:rgba(255,255,255,0.22);
-  --r:13px;--rsm:9px;--font:'Noto Sans JP',sans-serif;--mono:'Share Tech Mono',monospace;
-}
-html,body{height:100%;background:#03040A;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:22px}
-@media(max-width:700px){
-  html,body{
-    background:var(--bg)!important;
-    display:block!important;
-    width:100%!important;
-    height:100%!important;
-    overflow:hidden!important;
-    padding:0!important;
-    gap:0!important;
-  }
-  #panel{display:none!important}
-  #frame{
-    width:100vw!important;
-    height:100vh!important;
-    height:100dvh!important;
-    border-radius:0!important;
-    border:none!important;
-    box-shadow:none!important;
-    position:fixed!important;
-    top:0!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    margin:0!important;
-  }
-  .sb{padding-bottom:90px!important}
-}
-#panel{background:var(--card);border:0.5px solid var(--bdr2);border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;gap:3px;min-width:142px;flex-shrink:0;margin-top:4px}
-#panel h3{font-size:9px;letter-spacing:.13em;color:var(--txt3);text-transform:uppercase;padding-bottom:9px;border-bottom:0.5px solid var(--bdr);margin-bottom:3px}
-.pb{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:transparent;border:0.5px solid transparent;color:var(--txt3);font-size:11px;cursor:pointer;transition:.14s;text-align:left;white-space:nowrap;width:100%}
-.pb:hover{background:var(--bd);color:var(--blue2);border-color:var(--bb)}
-.pb.on{background:var(--bd);color:var(--blue2);border-color:var(--bb);font-weight:500}
-.pi{font-size:13px}
-#frame{width:375px;height:780px;background:var(--bg);border-radius:36px;overflow:hidden;position:relative;flex-shrink:0;border:1.5px solid rgba(59,130,246,0.2);box-shadow:0 0 0 1px rgba(255,255,255,0.03),0 32px 64px rgba(0,0,0,0.8),0 0 40px rgba(59,130,246,0.05)}
-.sc{display:none;height:100%;flex-direction:column;overflow:hidden}
-.sc.on{display:flex}
-.sb{flex:1;overflow-y:auto;padding-bottom:76px}
-.sb::-webkit-scrollbar{display:none}
-.hdr{padding:15px 17px 11px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--bdr);background:rgba(6,8,16,.97);flex-shrink:0}
-.logo{font-size:18px;font-weight:700;letter-spacing:.1em;color:#FFD700;font-family:var(--mono)}
-.logo-s{font-size:11px;color:#8892B0;letter-spacing:.06em;margin-top:2px}
-.htitle{font-size:17px;font-weight:700;color:#FFFFFF}
-.bk{background:none;border:none;color:var(--blue2);font-size:19px;cursor:pointer;padding:2px 6px 2px 0}
-.nav{position:absolute;bottom:0;left:0;right:0;background:rgba(8,10,20,.97);border-top:0.5px solid var(--bdr);display:flex;padding:6px 0 16px;z-index:30}
-.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:4px 2px}
-.ni .ic{font-size:17px;line-height:1}
-.ni .lb{font-size:11px;color:#8892B0}
-.ni.on .lb{color:#FFD700;font-weight:600}
-.npc{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer}
-.npc-c{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FF4D8D,#C9A84C);display:flex;align-items:center;justify-content:center;font-size:20px;margin-top:-14px;border:2px solid var(--bg);box-shadow:0 0 16px rgba(59,130,246,0.4)}
-.npc .lb{font-size:11px;color:#8892B0}
-.npc.on .lb{color:var(--blue2)}
-.ct{padding:13px 16px}
-.sec{font-size:12px;letter-spacing:.1em;color:#FF85B3;text-transform:uppercase;margin-bottom:12px;font-weight:600;border-left:3px solid #FF4D8D;padding-left:8px}
-.dv{height:0.5px;background:var(--bdr);margin:12px 0}
-.card{background:var(--card);border:1px solid var(--bdr2);border-radius:var(--r);padding:14px;margin-bottom:12px}
-.cblue{background:var(--bd);border-color:var(--bb)}
-.cgreen{background:var(--gnd);border-color:var(--gnb)}
-.cred{background:var(--rdd);border-color:var(--rdb)}
-.cgold{background:var(--gld);border-color:var(--glb)}
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.sc2{background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--rsm);padding:13px 11px;position:relative;overflow:hidden}
-.sl{font-size:12px;color:var(--txt3);margin-bottom:5px;letter-spacing:.04em;font-weight:500}
-.sv{font-size:24px;font-weight:700;color:#FFFFFF;line-height:1}
-.su{font-size:11px;font-weight:400;color:var(--txt2)}
-.sch{font-size:12px;margin-top:5px;font-weight:500}
-.sch.up{color:#2ECC71}
-.sch.dn{color:#FF5252}
-.sico{position:absolute;bottom:2px;right:6px;font-size:20px;opacity:.08}
-.aa{display:flex;align-items:center;gap:12px;padding:13px 14px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);border-radius:var(--rsm);margin-bottom:8px;cursor:pointer;transition:.14s}
-.aa:active{opacity:.75}
-.aa-i{font-size:15px;flex-shrink:0}
-.aa-t{font-size:14px;font-weight:600;color:#FFFFFF}
-.aa-s{font-size:12px;color:#8892B0;margin-top:3px}
-.aa-a{color:#FFD700;font-size:18px;font-weight:700}
-.sit{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:0.5px solid var(--bdr)}
-.stt{font-size:12px;color:var(--cyan);font-weight:500;white-space:nowrap;min-width:38px;font-family:var(--mono)}
-.stx{font-size:13px;color:#C8D0E8;line-height:1.6;flex:1}
-.stg{font-size:10px;padding:3px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0;font-weight:500}
-.tg-b{background:var(--bd);color:var(--blue2);border:0.5px solid var(--bb)}
-.tg-g{background:var(--gnd);color:var(--green);border:0.5px solid var(--gnb)}
-.tg-r{background:var(--rdd);color:var(--red);border:0.5px solid var(--rdb)}
-.tg-gd{background:var(--gld);color:var(--gold);border:0.5px solid var(--glb)}
-.mpr{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--bdr)}
-.mpl{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--txt)}
-.mst{font-size:10px;padding:2px 8px;border-radius:8px}
-.ms-ok{background:var(--gnd);color:var(--green);border:0.5px solid var(--gnb)}
-.ms-w{background:var(--bd);color:var(--blue2);border:0.5px solid var(--bb)}
-.ms-e{background:var(--rdd);color:var(--red);border:0.5px solid var(--rdb)}
-
-/* ACCOUNT GRID */
-.acgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.accard{background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm);padding:11px 10px;cursor:pointer;transition:.14s;position:relative}
-.accard.sel{border-color:var(--blue);background:rgba(59,130,246,0.09)}
-.accard.sel .acchk{display:flex}
-.acchk{position:absolute;top:7px;right:7px;width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:9px;display:none;align-items:center;justify-content:center}
-.ac-ico{font-size:18px;margin-bottom:4px}
-.ac-name{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:2px}
-.ac-handle{font-size:11px;color:var(--txt2);font-family:var(--mono);margin-bottom:3px}
-.ac-fol{font-size:11px;color:var(--cyan)}
-
-/* TEMPLATE CARDS */
-.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.tc{background:var(--card2);border:1px solid rgba(255,255,255,0.12);border-radius:var(--rsm);padding:14px 10px 12px;cursor:pointer;text-align:center;transition:.14s}
-.tc.on{border:2px solid #C9A84C;background:rgba(201,168,76,0.15)}
-.tc-i{font-size:20px;margin-bottom:4px;display:block}
-.tc-n{font-size:14px;font-weight:600;color:#FFFFFF}
-.tc-d{font-size:12px;color:#8892B0;margin-top:3px}
-
-/* BUTTONS */
-.btn{width:100%;padding:14px;border:none;border-radius:var(--rsm);background:linear-gradient(135deg,#FF4D8D,#C9A84C);color:#FFFFFF;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:.14s;font-family:var(--font);box-shadow:0 4px 20px rgba(255,77,141,0.35)}
-.btn:active{transform:scale(.98)}
-.btn:disabled{opacity:.5}
-.btn-red{background:linear-gradient(135deg,var(--red),#7F1D1D)}
-.bsm{padding:8px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.22);border-radius:var(--rsm);color:#FFFFFF;font-size:13px;cursor:pointer}
-.btn-tone{padding:8px 13px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.2);border-radius:16px;color:#C8D0E8;font-size:12px;cursor:pointer;transition:.14s;white-space:nowrap;font-weight:500}
-.btn-tone:hover{border-color:#FF85B3;color:#FFD700;background:rgba(201,168,76,0.12)}
-.brow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}
-.bcpy{display:flex;align-items:center;gap:4px;padding:6px 11px;background:var(--cyd);border:0.5px solid var(--cyb);border-radius:7px;color:var(--cyan);font-size:10px;cursor:pointer;transition:.14s}
-.bcpy.dn{background:rgba(6,182,212,0.22)}
-
-/* POST PREVIEW */
-.ppv{background:var(--card2);border:1px solid rgba(255,255,255,0.18);border-radius:var(--rsm);padding:16px;margin-bottom:12px;font-size:14px;line-height:2.0;color:#FFFFFF;min-height:110px;position:relative;white-space:pre-line}
-.pc{position:absolute;bottom:7px;right:10px;font-size:11px;color:#8892B0;font-family:var(--mono)}
-.ngok{display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;background:rgba(46,204,113,0.15);border:1px solid rgba(46,204,113,0.5);color:#2ECC71;font-weight:500}
-.ngwn{display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;background:rgba(255,82,82,0.15);border:1px solid rgba(255,82,82,0.5);color:#FF5252;font-weight:500}
-.spin{animation:sp 1s linear infinite;display:inline-block}
-@keyframes sp{to{transform:rotate(360deg)}}
-.pls{animation:pl 1.4s ease-in-out infinite}
-@keyframes pl{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
-
-/* BARS */
-.br2{display:flex;align-items:center;gap:7px;margin-bottom:7px}
-.blb{font-size:13px;color:#C8D0E8;min-width:66px;font-weight:500}
-.btr{flex:1;height:6px;background:var(--card2);border-radius:3px;overflow:hidden}
-.bfl{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--blue2))}
-.bfl.g{background:linear-gradient(90deg,var(--green),#4ADE80)}
-.bfl.r{background:linear-gradient(90deg,var(--red),#F87171)}
-.bfl.gd{background:linear-gradient(90deg,var(--gold),#FCD34D)}
-.bpc{font-size:13px;color:#FFFFFF;min-width:32px;text-align:right;font-weight:600}
-
-/* CALENDAR */
-.calgr{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:11px}
-.cdl{font-size:9px;color:var(--txt3);text-align:center;padding:3px 0}
-.cd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:11px;color:var(--txt2);cursor:pointer;position:relative}
-.cd.has{background:var(--bd);color:var(--blue2);font-weight:500}
-.cd.today{background:var(--blue);color:#fff;font-weight:700}
-.cd.oth{color:var(--txt3)}
-.cdot{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:var(--green)}
-
-/* PNL TICKER */
-.ticker{background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm);padding:10px 12px;margin-bottom:10px;overflow:hidden}
-.tick-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--bdr)}
-.tick-pair{font-size:11px;font-weight:600;color:var(--txt);font-family:var(--mono)}
-.tick-pnl{font-size:12px;font-weight:700;font-family:var(--mono)}
-.tick-up{color:var(--green)}
-.tick-dn{color:var(--red)}
-
-/* SETTINGS */
-.srow{padding:10px 0;border-bottom:0.5px solid var(--bdr)}
-.srl{font-size:13px;color:#C8D0E8;margin-bottom:6px;font-weight:500}
-.sinp{width:100%;padding:11px 13px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#FFFFFF;font-size:15px;outline:none;font-family:var(--font)}
-.sinp:focus{border-color:#FF85B3;background:rgba(201,168,76,0.08)}
-.trow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--bdr)}
-.tn{font-size:15px;color:#FFFFFF;font-weight:500}
-.ts{font-size:12px;color:#8892B0;margin-top:3px}
-.tog{width:38px;height:21px;background:var(--card2);border:0.5px solid var(--bdr);border-radius:11px;cursor:pointer;position:relative;transition:.2s;flex-shrink:0}
-.tog.on{background:var(--blue);border-color:var(--blue)}
-.tog-t{position:absolute;top:3px;left:3px;width:13px;height:13px;border-radius:50%;background:#fff;transition:.2s}
-.tog.on .tog-t{left:20px}
-.plb{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(201,168,76,0.18);border:1px solid rgba(77,150,255,0.5);border-radius:16px;font-size:12px;color:#FFD700;margin-bottom:14px;font-weight:600}
-
-/* DM */
-.dmc{background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm);padding:11px;margin-bottom:8px}
-.dmt{font-size:12px;color:#00D4FF;letter-spacing:.04em;margin-bottom:6px;display:block;font-weight:600}
-.dmx{font-size:14px;color:#C8D0E8;line-height:1.85;margin-bottom:10px}
-
-/* ONBOARD */
-.obw{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;overflow-y:auto}
-.ob-chart{display:flex;align-items:flex-end;gap:3px;height:60px;margin-bottom:20px;justify-content:center}
-.ob-bar{width:12px;border-radius:2px 2px 0 0;background:linear-gradient(180deg,var(--green),#064E3B)}
-.obl{font-size:30px;font-weight:700;color:var(--blue2);letter-spacing:.1em;font-family:var(--mono);margin-bottom:2px}
-.obt{font-size:9px;color:var(--txt3);letter-spacing:.16em;margin-bottom:30px}
-.obtt{font-size:20px;font-weight:700;color:var(--txt);line-height:1.45;margin-bottom:9px}
-.obds{font-size:14px;color:var(--txt);line-height:1.9;margin-bottom:26px}
-.fl{text-align:left;width:100%;margin-bottom:26px}
-.fi{display:flex;align-items:center;gap:9px;padding:7px 0;font-size:13px;color:var(--txt)}
-.fd{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0}
-
-/* CHART */
-.chartv{display:flex;align-items:flex-end;gap:4px;height:62px;margin-bottom:2px}
-.chc{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
-.chb{width:100%;border-radius:2px 2px 0 0;background:linear-gradient(180deg,var(--green),#064E3B);min-height:3px}
-.chb.b{background:linear-gradient(180deg,var(--blue),#1E3A8A)}
-.chb.r{background:linear-gradient(180deg,var(--red),#7F1D1D)}
-.chl{font-size:8px;color:var(--txt3);text-align:center}
-
-.done-ico{font-size:44px;text-align:center;margin-bottom:9px}
-.done-t{font-size:17px;font-weight:700;color:var(--green);text-align:center;margin-bottom:6px}
-.done-s{font-size:11px;color:var(--txt3);text-align:center;margin-bottom:20px;line-height:1.7}
-
-/* 10-account list */
-.aclist{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
-.acitem{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card2);border:0.5px solid var(--bdr);border-radius:var(--rsm)}
-.acitem-ico{font-size:18px;flex-shrink:0}
-.acitem-info{flex:1}
-.acitem-name{font-size:12px;font-weight:500;color:var(--txt)}
-.acitem-meta{font-size:10px;color:var(--txt3);font-family:var(--mono)}
-.acitem-fol{font-size:10px;color:var(--cyan)}
-.acitem-tog{flex-shrink:0}
-.add-ac{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;background:transparent;border:0.5px dashed var(--bdr2);border-radius:var(--rsm);color:var(--txt3);font-size:12px;cursor:pointer;transition:.14s;width:100%}
-.add-ac:hover{border-color:var(--blue);color:var(--blue2)}
-.ac-count{font-size:12px;color:var(--txt2);margin-bottom:10px}
-</style>
-</head>
-<body>
-
-<div id="panel">
-  <h3>画面を選ぶ</h3>
-  <button class="pb on" id="pb-ob" onclick="go('ob')"><span class="pi">▶</span> オープニング</button>
-  <button class="pb" id="pb-db" onclick="go('db')"><span class="pi">📊</span> ダッシュボード</button>
-  <button class="pb" id="pb-post" onclick="go('post')"><span class="pi">✍️</span> 投稿作成</button>
-  <button class="pb" id="pb-cal" onclick="go('cal')"><span class="pi">📅</span> カレンダー</button>
-  <button class="pb" id="pb-an" onclick="go('an')"><span class="pi">📈</span> AI分析</button>
-  <button class="pb" id="pb-dm" onclick="go('dm')"><span class="pi">💬</span> DM返信</button>
-  <button class="pb" id="pb-cfg" onclick="go('cfg')"><span class="pi">⚙️</span> 設定</button>
-</div>
-
-<div id="frame">
-
-<!-- ONBOARDING -->
-<div id="sc-ob" class="sc on">
-  <div class="obw">
-    <div class="ob-chart">
-      <div class="ob-bar" style="height:25%"></div>
-      <div class="ob-bar" style="height:40%"></div>
-      <div class="ob-bar" style="height:30%"></div>
-      <div class="ob-bar" style="height:65%"></div>
-      <div class="ob-bar" style="height:50%"></div>
-      <div class="ob-bar" style="height:80%"></div>
-      <div class="ob-bar" style="height:70%"></div>
-      <div class="ob-bar" style="height:100%"></div>
-    </div>
-    <div class="obl">NOCTIS</div>
-    <div class="obt">夜職求人 AI MANAGER</div>
-    <div class="obtt">EA販売・トレーダー向け<br>SNS一括管理AIツール</div>
-    <div class="obds">最大<strong style="color:var(--blue2)">10アカウント</strong>を一括管理。<br>爆益・実績・煽り投稿を<strong style="color:var(--green)">AIが自動生成。</strong><br>応募数をAIで最大化する。</div>
-    <div class="fl">
-      <div class="fi"><div class="fd"></div>X・Threads・Bluesky 10アカウントまで登録</div>
-      <div class="fi"><div class="fd"></div>女の子紹介・稼げる訴求・求人テンプレ搭載</div>
-      <div class="fi"><div class="fd"></div>凍結防止NGチェック内蔵</div>
-      <div class="fi"><div class="fd"></div>応募者DM返信テンプレで工数ゼロ</div>
-    </div>
-    <button class="btn" onclick="go('db')" style="font-size:14px;padding:15px">まずは店舗設定をする →</button>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
+<!-- ===== DASHBOARD ===== -->
 <div id="sc-db" class="sc">
   <div class="hdr">
     <div><div class="logo">NOCTIS</div><div class="logo-s">求人ブランディング AI</div></div>
-    <div style="display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block" class="pls"></span><span style="font-size:9px;color:var(--txt3)">LIVE</span></div>
+    <div style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--gn);display:inline-block"></span><span style="font-size:10px;color:var(--txt3)">API連携中</span></div>
   </div>
   <div class="sb"><div class="ct">
-    <div style="font-size:9px;color:var(--txt3);margin-bottom:8px;font-family:var(--mono)">3月19日（木）のパフォーマンス</div>
-
-    <!-- PNL TICKER -->
-    <div class="card" style="padding:12px 14px;margin-bottom:12px;background:rgba(255,77,141,0.08);border:1px solid rgba(255,77,141,0.3)">
-      <div style="font-size:10px;color:#FF85B3;letter-spacing:.08em;margin-bottom:8px;font-weight:600">✦ 今週の応募サマリー</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid rgba(255,255,255,0.08)"><span style="font-size:12px;color:#C8D0E8">X メインアカウント</span><span style="font-size:13px;font-weight:700;color:#2ECC71">応募 8件</span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid rgba(255,255,255,0.08)"><span style="font-size:12px;color:#C8D0E8">Threads</span><span style="font-size:13px;font-weight:700;color:#2ECC71">応募 4件</span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0"><span style="font-size:12px;color:#C8D0E8">独自LP経由</span><span style="font-size:13px;font-weight:700;color:#2ECC71">応募 6件</span></div>
+    <div style="font-size:11px;color:var(--txt3);margin-bottom:12px;font-family:var(--mono)" id="db-date"></div>
+    <!-- SNS接続状態 -->
+    <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px">
+      <div style="flex-shrink:0;background:var(--gnd);border:1px solid var(--gnb);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px"><span style="font-size:12px">𝕏</span><span style="font-size:11px;color:var(--gn);font-weight:600">接続中</span></div>
+      <div style="flex-shrink:0;background:var(--gnd);border:1px solid var(--gnb);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px"><span style="font-size:12px">Ig</span><span style="font-size:11px;color:var(--gn);font-weight:600">接続中</span></div>
+      <div style="flex-shrink:0;background:var(--gnd);border:1px solid var(--gnb);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px"><span style="font-size:12px">🧵</span><span style="font-size:11px;color:var(--gn);font-weight:600">接続中</span></div>
+      <div style="flex-shrink:0;background:var(--bld);border:1px solid var(--blb);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px"><span style="font-size:12px">🦋</span><span style="font-size:11px;color:var(--bl);font-weight:600">未接続</span></div>
     </div>
-
     <div class="sgrid">
-      <div class="sc2"><div class="sl">今日の投稿数</div><div class="sv">7<span class="su"> 件</span></div><div class="sch up">↑ 3媒体配信済み</div><div class="sico">📝</div></div>
-      <div class="sc2"><div class="sl">フォロワー増加</div><div class="sv">+124<span class="su"> 人</span></div><div class="sch up">↑ 今月最高</div><div class="sico">📈</div></div>
-      <div class="sc2"><div class="sl">DM問い合わせ</div><div class="sv">23<span class="su"> 件</span></div><div class="sch up">↑ 先週比+8件</div><div class="sico">💬</div></div>
-      <div class="sc2"><div class="sl">成約数（今週）</div><div class="sv">6<span class="su"> 件</span></div><div class="sch up">↑ 転換率26%</div><div class="sico">💰</div></div>
+      <div class="sc2"><div class="sl">今週の応募数</div><div class="sv">18<span class="su"> 件</span></div><div class="sch up">先週比 +6件</div></div>
+      <div class="sc2"><div class="sl">未読DM</div><div class="sv">8<span class="su"> 件</span></div><div class="sch up">X:5 Ig:3</div></div>
+      <div class="sc2"><div class="sl">今日の投稿数</div><div class="sv">5<span class="su"> 件</span></div><div class="sch up">3媒体配信済み</div></div>
+      <div class="sc2"><div class="sl">フォロワー合計</div><div class="sv">4.2<span class="su"> K</span></div><div class="sch up">今週 +124人</div></div>
     </div>
-
-    <div class="sec">アカウントステータス</div>
-    <div class="card" style="padding:11px 13px;margin-bottom:12px">
-      <div class="mpr"><div class="mpl"><span style="font-size:13px">𝕏</span>@stella_shinjuku_official（1.2万フォロワー）</div><span class="mst ms-ok">本日4投稿</span></div>
-      <div class="mpr"><div class="mpl"><span style="font-size:13px">𝕏</span>@stella_shinjuku_cast（8,400フォロワー）</div><span class="mst ms-ok">本日3投稿</span></div>
-      <div class="mpr"><div class="mpl"><span style="font-size:13px">🧵</span>@stella_shinjuku_official（3,200フォロワー）</div><span class="mst ms-w">21:00 予約中</span></div>
-      <div class="mpr" style="border:none"><div class="mpl"><span style="font-size:13px">🦋</span>@ea_bluesky（890フォロワー）</div><span class="mst ms-ok">本日2投稿</span></div>
-    </div>
-
     <div class="sec">AIおすすめアクション</div>
-    <div class="aa" onclick="go('post')"><div class="aa-i">🔥</div><div style="flex:1"><div class="aa-t">今夜21時に「女の子紹介」投稿</div><div class="aa-s">木曜夜はEA垢の反応率が最高潮</div></div><div class="aa-a">›</div></div>
-    <div class="aa" onclick="go('post')"><div class="aa-i">⚡</div><div style="flex:1"><div class="aa-t">「限定募集」煽り投稿のタイミング</div><div class="aa-s">週末前の今日がベストタイミング</div></div><div class="aa-a">›</div></div>
-    <div class="aa" onclick="go('dm')"><div class="aa-i">💬</div><div style="flex:1"><div class="aa-t">未対応DM 8件をクローズしよう</div><div class="aa-s">テンプレで即返信・成約率UP</div></div><div class="aa-a">›</div></div>
+    <div class="aa" onclick="go('post')"><div style="font-size:22px">&#127800;</div><div style="flex:1"><div class="aa-t">今夜21時に「女の子紹介」投稿</div><div class="aa-s">木曜夜は反応率1.8倍。全媒体配信推奨</div></div><div class="aa-a">›</div></div>
+    <div class="aa" onclick="go('dm')"><div style="font-size:22px">&#128172;</div><div style="flex:1"><div class="aa-t">未読DM 8件に返信する</div><div class="aa-s">X・Instagramに新着あり</div></div><div class="aa-a">›</div></div>
+    <div class="aa" onclick="go('fol')"><div style="font-size:22px">&#128200;</div><div style="flex:1"><div class="aa-t">ハッシュタグを最適化する</div><div class="aa-s">フォロワー増加率が2.3倍になります</div></div><div class="aa-a">›</div></div>
     <div class="dv"></div>
     <div class="sec">今日の投稿実績</div>
-    <div class="sit"><div class="stt">09:00</div><div class="stx">🌸 本日のおすすめキャストをご紹介！...</div><div class="stg tg-g">女の子紹介</div></div>
-    <div class="sit"><div class="stt">12:00</div><div class="stx">💰 未経験でも月50万円可能！実際の...</div><div class="stg tg-b">稼げる訴求</div></div>
-    <div class="sit" style="border:none"><div class="stt">18:00</div><div class="stx">📣 急募！体験入店随時受付中。日払い...</div><div class="stg tg-r">求人募集</div></div>
+    <div class="sit"><div class="stt">09:00</div><div class="stx">本日のおすすめキャストをご紹介...</div><span class="stg tg-g">投稿済み</span></div>
+    <div class="sit"><div class="stt">12:00</div><div class="stx">実際いくら稼げる？先月の実績を公開...</div><span class="stg tg-g">投稿済み</span></div>
+    <div class="sit" style="border:none"><div class="stt">21:00</div><div class="stx">急募！体験入店随時受付中...</div><span class="stg tg-b">予約中</span></div>
   </div></div>
   <nav class="nav">
-    <button class="ni on" onclick="go('db')"><span class="ic">&#127968;</span><span class="lb">ホーム</span></button>
-    <button class="ni" onclick="go('cal')"><span class="ic">&#128197;</span><span class="lb">カレンダー</span></button>
-    <button class="npc" onclick="go('post')"><div class="npc-c">&#10022;</div><span class="lb">投稿</span></button>
-    <button class="ni" onclick="go('dm')"><span class="ic">&#128172;</span><span class="lb">DM返信</span></button>
-    <button class="ni" onclick="go('cfg')"><span class="ic">&#9881;&#65039;</span><span class="lb">設定</span></button>
+    <button class="ni on" onclick="go('db')"><span class="lb">ホーム</span></button>
+    <button class="ni" onclick="go('dm')"><span class="lb">DM</span></button>
+    <button class="npc" onclick="go('post')"><div class="npc-c">+</div><span class="lb">投稿</span></button>
+    <button class="ni" onclick="go('cal')"><span class="lb">カレンダー</span></button>
+    <button class="ni" onclick="go('cfg')"><span class="lb">設定</span></button>
   </nav>
 </div>
 
-<!-- ACCOUNT MANAGEMENT -->
-<!-- POST CREATE -->
+<!-- ===== DM INBOX ===== -->
+<div id="sc-dm" class="sc">
+  <div class="hdr">
+    <button class="bk" onclick="go('db')">&#8592;</button>
+    <div class="htitle">DM受信箱</div>
+    <div style="display:flex;gap:6px">
+      <button id="dm-filter-x" class="bsm" style="padding:5px 10px;font-size:11px;border-color:var(--pkb);color:var(--pk2)" onclick="filterDm('x')">𝕏</button>
+      <button id="dm-filter-ig" class="bsm" style="padding:5px 10px;font-size:11px" onclick="filterDm('ig')">Ig</button>
+      <button id="dm-filter-all" class="bsm" style="padding:5px 10px;font-size:11px" onclick="filterDm('all')">全て</button>
+    </div>
+  </div>
+  <div class="sb"><div class="ct">
+    <div style="font-size:12px;color:var(--txt3);margin-bottom:12px">未読 <span style="color:var(--pk2);font-weight:700">8件</span> / 全38件</div>
+    <div id="dm-list"></div>
+  </div></div>
+  <nav class="nav">
+    <button class="ni" onclick="go('db')"><span class="lb">ホーム</span></button>
+    <button class="ni on" onclick="go('dm')"><span class="lb">DM</span></button>
+    <button class="npc" onclick="go('post')"><div class="npc-c">+</div><span class="lb">投稿</span></button>
+    <button class="ni" onclick="go('cal')"><span class="lb">カレンダー</span></button>
+    <button class="ni" onclick="go('cfg')"><span class="lb">設定</span></button>
+  </nav>
+</div>
+
+<!-- ===== DM DETAIL ===== -->
+<div id="sc-dm-detail" class="sc">
+  <div class="hdr">
+    <button class="bk" onclick="go('dm')">&#8592;</button>
+    <div>
+      <div class="htitle" id="dm-detail-name"></div>
+      <div style="font-size:10px;color:var(--txt3)" id="dm-detail-plat"></div>
+    </div>
+    <div style="width:30px"></div>
+  </div>
+  <div class="sb" id="dm-messages" style="padding:14px 16px;display:flex;flex-direction:column;gap:4px"></div>
+  <div style="flex-shrink:0;padding:10px 14px;border-top:0.5px solid var(--bdr);background:rgba(8,6,16,0.97)">
+    <div id="dm-ai-reply" style="display:none;background:var(--card2);border:1px solid var(--pkb);border-radius:var(--rsm);padding:12px;margin-bottom:8px;font-size:13px;color:var(--txt);line-height:1.7"></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <textarea id="dm-reply-input" class="sinp" rows="2" placeholder="返信を入力..." style="flex:1;resize:none;font-size:13px"></textarea>
+      <button onclick="sendDmReply()" style="width:44px;height:44px;border-radius:var(--rsm);background:linear-gradient(135deg,var(--pk),var(--gd));border:none;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0">›</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn-tone" onclick="genAiReply()">AIで返信文を生成</button>
+      <button class="btn-tone" onclick="useAiReply()">AIの文章を使う</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== POST CREATE ===== -->
 <div id="sc-post" class="sc">
   <div class="hdr">
-    <button class="bk" onclick="go('db')">←</button>
+    <button class="bk" onclick="go('db')">&#8592;</button>
     <div class="htitle">投稿を作る</div>
     <div style="width:30px"></div>
   </div>
   <div class="sb"><div class="ct">
-    <div class="sec">① 配信アカウントを選ぶ（設定でONにしたアカウント）</div>
-    <div id="post-ac-grid" class="sng" style="margin-bottom:14px"></div>
-
+    <div class="sec">① 配信先SNSを選ぶ</div>
+    <div class="acgrid" id="post-ac-grid"></div>
     <div class="sec">② テンプレを選ぶ</div>
     <div class="tgrid">
-      <div class="tc on" onclick="sTmpl(this,'女の子紹介')"><span class="tc-i">🔥</span><div class="tc-n">女の子紹介</div><div class="tc-d">利益確定を発信</div></div>
-      <div class="tc" onclick="sTmpl(this,'店舗の雰囲気')"><span class="tc-i">📊</span><div class="tc-n">店舗の雰囲気</div><div class="tc-d">証拠スクショ系</div></div>
-      <div class="tc" onclick="sTmpl(this,'稼げる訴求')"><span class="tc-i">🚨</span><div class="tc-n">稼げる訴求</div><div class="tc-d">残り枠・締切り</div></div>
-      <div class="tc" onclick="sTmpl(this,'緊急速報')"><span class="tc-i">⚡</span><div class="tc-n">緊急速報</div><div class="tc-d">相場アラート系</div></div>
-      <div class="tc" onclick="sTmpl(this,'求人募集')"><span class="tc-i">🏆</span><div class="tc-n">求人募集</div><div class="tc-d">実績・歴史を語る</div></div>
-      <div class="tc" onclick="sTmpl(this,'EA紹介')"><span class="tc-i">🤖</span><div class="tc-n">EA紹介</div><div class="tc-d">商品の魅力を発信</div></div>
+      <div class="tc on" onclick="selTmpl(this,'女の子紹介')"><span class="tc-i">&#127800;</span><div class="tc-n">女の子紹介</div><div class="tc-d">キャスト魅力を発信</div></div>
+      <div class="tc" onclick="selTmpl(this,'稼げる訴求')"><span class="tc-i">&#128176;</span><div class="tc-n">稼げる訴求</div><div class="tc-d">高収入をアピール</div></div>
+      <div class="tc" onclick="selTmpl(this,'店舗の雰囲気')"><span class="tc-i">&#10024;</span><div class="tc-n">店舗の雰囲気</div><div class="tc-d">安心感を伝える</div></div>
+      <div class="tc" onclick="selTmpl(this,'スタッフ投稿')"><span class="tc-i">&#128081;</span><div class="tc-n">スタッフ投稿</div><div class="tc-d">信頼感を出す</div></div>
+      <div class="tc" onclick="selTmpl(this,'求人募集')"><span class="tc-i">&#128226;</span><div class="tc-n">求人募集</div><div class="tc-d">直接的な求人訴求</div></div>
+      <div class="tc" onclick="selTmpl(this,'体験入店')"><span class="tc-i">&#128134;</span><div class="tc-n">体験入店</div><div class="tc-d">体験入店を訴求</div></div>
     </div>
-
-    <button class="btn" id="gbtn" onclick="doGen()">✦ AIで投稿を生成する</button>
-
+    <div class="sec">③ キーワードを入力（任意）</div>
+    <textarea id="kw-input" class="sinp" rows="2" placeholder="例：新人・20歳・笑顔がかわいい・体験入店OK・新宿" style="resize:none;margin-bottom:6px"></textarea>
+    <div style="font-size:11px;color:var(--txt3);margin-bottom:14px">キーワードをもとにAIが投稿文を生成します。空欄でもOK。</div>
+    <button class="btn" id="gbtn" onclick="doGen()">AIで投稿文を生成する</button>
     <div id="pres" style="display:none;margin-top:16px">
-      <div class="sec">③ 生成された投稿</div>
-      <div class="ppv"><div id="gld" style="display:flex;align-items:center;gap:7px;color:var(--txt3);font-size:11px"><span class="spin">⟳</span><span>AIが生成中...</span></div><div id="gout" style="display:none"></div><div class="pc" id="pct"></div></div>
-      <div class="sec">トーンを調整する</div>
-      <div class="brow">
-        <button class="btn-tone" onclick="adj('more')">🔥 もっと煽る</button>
-        <button class="btn-tone" onclick="adj('trust')">🏆 信頼感UP</button>
-        <button class="btn-tone" onclick="adj('urgent')">⚡ 緊急感UP</button>
-        <button class="btn-tone" onclick="adj('soft')">📊 数字を前面に</button>
+      <div class="sec">④ 生成された投稿（直接編集できます）</div>
+      <textarea id="gen-ta" class="sinp" rows="7" placeholder="ここに投稿文が表示されます" style="resize:none;margin-bottom:6px;font-size:13px;line-height:1.9"></textarea>
+      <div id="gen-loading" style="display:none;align-items:center;gap:8px;color:var(--txt3);font-size:12px;padding:8px 0"><span class="spin">&#8987;</span><span>AIが生成中...</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div id="pct" style="font-size:11px;color:var(--txt3);font-family:var(--mono)">0 / 280</div>
+        <button onclick="doGen()" style="background:none;border:none;color:var(--pk2);font-size:12px;cursor:pointer;font-family:var(--font)">再生成する</button>
       </div>
-      <div id="ngr" class="ngok"><span>✓</span><span>規約チェックOK　BANリスク：低</span></div>
-      <div class="sec">④ 配信先の確認</div>
+      <div class="sec">トーン調整</div>
+      <div class="brow">
+        <button class="btn-tone" onclick="adjTone('more')">もっと過激に</button>
+        <button class="btn-tone" onclick="adjTone('trust')">優しい印象</button>
+        <button class="btn-tone" onclick="adjTone('urgent')">緊急感UP</button>
+        <button class="btn-tone" onclick="adjTone('soft')">シンプルに</button>
+      </div>
+      <div class="ngok">&#10003; NGワードなし　凍結リスク：低</div>
+      <div class="sec">⑤ 配信先の確認</div>
       <div id="mpc" class="card" style="padding:11px 13px;margin-bottom:12px"></div>
       <div style="display:flex;gap:8px">
         <button class="bsm" style="flex:1" onclick="go('cal')">予約投稿</button>
-        <button class="btn" style="flex:2;font-size:12px;padding:11px" onclick="sDone()">全アカウントに投稿</button>
+        <button class="btn" style="flex:2;font-size:13px;padding:12px" onclick="doPost()">全SNSに投稿する</button>
       </div>
     </div>
-    <div id="pdone" style="display:none;margin-top:18px;text-align:center">
-      <div class="done-ico">✓</div>
-      <div class="done-t">投稿完了！</div>
-      <div class="done-s" id="ddet"></div>
-      <button class="btn" onclick="rPost()">もう一件作る</button>
+    <div id="pdone" style="display:none;margin-top:20px;text-align:center">
+      <div style="font-size:48px;margin-bottom:10px">&#10003;</div>
+      <div style="font-size:18px;font-weight:700;color:var(--gn);margin-bottom:6px">投稿しました！</div>
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:20px;line-height:1.7" id="ddet"></div>
+      <button class="btn" onclick="resetPost()">もう一件作る</button>
     </div>
   </div></div>
   <nav class="nav">
-    <button class="ni" onclick="go('db')"><span class="ic">&#127968;</span><span class="lb">ホーム</span></button>
-    <button class="ni" onclick="go('cal')"><span class="ic">&#128197;</span><span class="lb">カレンダー</span></button>
-    <button class="npc on" onclick="go('post')"><div class="npc-c">&#10022;</div><span class="lb">投稿</span></button>
-    <button class="ni" onclick="go('dm')"><span class="ic">&#128172;</span><span class="lb">DM返信</span></button>
-    <button class="ni" onclick="go('cfg')"><span class="ic">&#9881;&#65039;</span><span class="lb">設定</span></button>
+    <button class="ni" onclick="go('db')"><span class="lb">ホーム</span></button>
+    <button class="ni" onclick="go('dm')"><span class="lb">DM</span></button>
+    <button class="npc on" onclick="go('post')"><div class="npc-c">+</div><span class="lb">投稿</span></button>
+    <button class="ni" onclick="go('cal')"><span class="lb">カレンダー</span></button>
+    <button class="ni" onclick="go('cfg')"><span class="lb">設定</span></button>
   </nav>
 </div>
 
-<!-- CALENDAR -->
+<!-- ===== CALENDAR ===== -->
 <div id="sc-cal" class="sc">
   <div class="hdr">
     <button class="bk" onclick="go('db')">&#8592;</button>
-    <div class="htitle" id="cal-title"></div>
+    <div class="htitle" id="cal-title">カレンダー</div>
     <div style="display:flex;gap:6px">
-      <button class="bsm" style="padding:4px 10px;font-size:14px" onclick="changeMonth(-1)">&#8249;</button>
-      <button class="bsm" style="padding:4px 10px;font-size:14px" onclick="changeMonth(1)">&#8250;</button>
+      <button class="bsm" style="padding:5px 11px;font-size:15px" onclick="changeMonth(-1)">&#8249;</button>
+      <button class="bsm" style="padding:5px 11px;font-size:15px" onclick="changeMonth(1)">&#8250;</button>
     </div>
   </div>
   <div class="sb"><div class="ct">
-    <div class="calgr">
-      <div class="cdl">&#26085;</div><div class="cdl">&#26376;</div><div class="cdl">&#706b;</div>
-      <div class="cdl">&#27700;</div><div class="cdl">&#26408;</div><div class="cdl">&#37329;</div><div class="cdl">&#22303;</div>
+    <div class="calgr"><div class="cdl">日</div><div class="cdl">月</div><div class="cdl">火</div><div class="cdl">水</div><div class="cdl">木</div><div class="cdl">金</div><div class="cdl">土</div></div>
+    <div id="cal-days" class="calgr" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:12px;margin-bottom:14px;font-size:11px">
+      <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:50%;background:var(--gn)"></div><span style="color:var(--txt3)">投稿済み</span></div>
+      <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:50%;background:var(--pk)"></div><span style="color:var(--txt3)">予約中</span></div>
     </div>
-    <div id="cal-days" class="calgr" style="margin-bottom:10px"></div>
-    <div style="display:flex;gap:10px;margin-bottom:14px;font-size:10px">
-      <div style="display:flex;align-items:center;gap:4px">
-        <div style="width:7px;height:7px;border-radius:50%;background:var(--green)"></div>
-        <span style="color:var(--txt3)">&#25295;&#31295;&#28168;&#12415;</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:4px">
-        <div style="width:7px;height:7px;border-radius:50%;background:var(--blue)"></div>
-        <span style="color:var(--txt3)">&#20104;&#32004;&#20013;</span>
-      </div>
-    </div>
-
-    <div id="no-date-msg" style="text-align:center;padding:18px 0;color:var(--txt3);font-size:12px">
-      &#26085;&#20184;&#12434;&#12479;&#12483;&#12503;&#12375;&#12390;&#25295;&#31295;&#12434;&#30906;&#35469;&#12539;&#36861;&#21152;
-    </div>
-
+    <div id="no-date-msg" style="text-align:center;padding:20px 0;color:var(--txt3);font-size:13px">日付をタップして投稿を確認・追加</div>
     <div id="date-panel" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
         <div class="sec" style="margin:0" id="sel-date-lbl"></div>
-        <button class="btn" style="width:auto;padding:7px 14px;font-size:11px" onclick="openAddModal()">+ &#36861;&#21152;</button>
+        <button class="btn" style="width:auto;padding:8px 15px;font-size:12px" onclick="openCalModal()">+ 追加</button>
       </div>
       <div id="date-posts"></div>
     </div>
-
     <div class="dv"></div>
-    <div class="sec">&#20170;&#26376;&#12398;&#25295;&#31295;&#12469;&#12510;&#12522;</div>
-    <div class="card" style="padding:11px 13px">
-      <div class="br2">
-        <div class="blb">&#25295;&#31295;&#28168;&#12415;</div>
-        <div class="btr"><div class="bfl g" id="bar-done" style="width:0%"></div></div>
-        <div class="bpc" id="cnt-done">0&#20214;</div>
-      </div>
-      <div class="br2" style="margin:0">
-        <div class="blb">&#20104;&#32004;&#20013;</div>
-        <div class="btr"><div class="bfl" id="bar-sched" style="width:0%"></div></div>
-        <div class="bpc" id="cnt-sched">0&#20214;</div>
-      </div>
+    <div class="sec">今月のサマリー</div>
+    <div class="card" style="padding:12px 14px">
+      <div class="br2"><div class="blb">投稿済み</div><div class="btr"><div class="bfl g" id="bar-done" style="width:0%"></div></div><div class="bpc" id="cnt-done">0件</div></div>
+      <div class="br2" style="margin:0"><div class="blb">予約中</div><div class="btr"><div class="bfl" id="bar-sched" style="width:0%"></div></div><div class="bpc" id="cnt-sched">0件</div></div>
     </div>
   </div></div>
-
-  <div id="cal-modal" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.78);z-index:50;align-items:flex-end">
-    <div style="background:var(--card);border-radius:20px 20px 0 0;padding:20px 18px 34px;width:100%">
-      <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:14px" id="modal-ttl">&#25295;&#31295;&#12434;&#36861;&#21152;</div>
-      <div class="srl" style="margin-bottom:4px">&#12486;&#12531;&#12503;&#12524;</div>
-      <select class="sinp" id="m-tmpl" style="margin-bottom:10px">
-        <option>&#30002;&#30410;&#5831;&#21578;</option>
-        <option>&#21213;&#29575;&#23454;&#绩;</option>
-        <option>&#38480;&#23450;&#717d&#308a;</option>
-        <option>&#31192;&#24613;&#36895;&#22577;</option>
-        <option>&#20449;&#983;&#27083;&#31689;</option>
-        <option>EA&#32057;&#20171;</option>
-      </select>
-      <div class="srl" style="margin-bottom:4px">&#25295;&#31295;&#20869;&#23481;</div>
+  <div id="cal-modal" class="modal-wrap">
+    <div class="modal-box">
+      <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:14px" id="cal-modal-ttl">投稿を追加</div>
+      <div class="srl" style="margin-bottom:4px">テンプレ</div>
+      <select class="sinp" id="m-tmpl" style="margin-bottom:10px"><option>女の子紹介</option><option>稼げる訴求</option><option>店舗の雰囲気</option><option>スタッフ投稿</option><option>求人募集</option><option>体験入店</option></select>
+      <div class="srl" style="margin-bottom:4px">投稿内容</div>
       <textarea class="sinp" id="m-text" rows="4" style="resize:none;margin-bottom:10px"></textarea>
       <div style="display:flex;gap:10px;margin-bottom:14px">
-        <div style="flex:1">
-          <div class="srl" style="margin-bottom:4px">&#26178;&#38291;</div>
-          <input class="sinp" id="m-time" type="time" value="21:00">
-        </div>
-        <div style="flex:1">
-          <div class="srl" style="margin-bottom:4px">&#12473;&#12486;&#12540;&#12479;&#12473;</div>
-          <select class="sinp" id="m-status">
-            <option value="scheduled">&#20104;&#32004;&#20013;</option>
-            <option value="done">&#25295;&#31295;&#28168;&#12415;</option>
-          </select>
-        </div>
+        <div style="flex:1"><div class="srl" style="margin-bottom:4px">時間</div><input class="sinp" id="m-time" type="time" value="21:00"></div>
+        <div style="flex:1"><div class="srl" style="margin-bottom:4px">ステータス</div><select class="sinp" id="m-status"><option value="scheduled">予約中</option><option value="done">投稿済み</option></select></div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="bsm" style="flex:1;padding:12px" onclick="closeCalModal()">&#12461;&#12515;&#12531;&#12475;&#12523;</button>
-        <button class="btn" style="flex:2;padding:12px;font-size:13px" id="modal-save-btn" onclick="saveCalPost()">&#36861;&#21152;&#12377;&#12427;</button>
+        <button class="bsm" style="flex:1;padding:12px" onclick="closeCalModal()">キャンセル</button>
+        <button class="btn" style="flex:2;padding:12px;font-size:13px" id="cal-save-btn" onclick="saveCalPost()">追加する</button>
       </div>
     </div>
   </div>
-
-  <div id="del-modal" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.78);z-index:51;align-items:center;justify-content:center">
-    <div style="background:var(--card);border-radius:14px;padding:22px 18px;width:78%;text-align:center">
-      <div style="font-size:13px;color:var(--txt);margin-bottom:16px">&#12371;&#12398;&#25295;&#31295;&#12434;&#21066;&#38500;&#12375;&#12414;&#12377;&#12363;&#65311;</div>
+  <div id="cal-del-modal" class="modal-center">
+    <div class="modal-box-c">
+      <div style="font-size:13px;color:var(--txt);margin-bottom:16px">この投稿を削除しますか？</div>
       <div style="display:flex;gap:8px">
-        <button class="bsm" style="flex:1;padding:10px" onclick="document.getElementById('del-modal').style.display='none'">&#12461;&#12515;&#12531;&#12475;&#12523;</button>
-        <button class="btn btn-red" style="flex:1;padding:10px;font-size:12px" onclick="confirmCalDelete()">&#21066;&#38500;&#12377;&#12427;</button>
+        <button class="bsm" style="flex:1;padding:10px" onclick="document.getElementById('cal-del-modal').style.display='none'">キャンセル</button>
+        <button class="btn" style="flex:1;padding:10px;font-size:12px;background:var(--rd);box-shadow:none" onclick="confirmCalDel()">削除する</button>
       </div>
     </div>
   </div>
-
   <nav class="nav">
-    <button class="ni" onclick="go('db')"><span class="ic">&#127968;</span><span class="lb">ホーム</span></button>
-    <button class="ni on" onclick="go('cal')"><span class="ic">&#128197;</span><span class="lb">カレンダー</span></button>
-    <button class="npc" onclick="go('post')"><div class="npc-c">&#10022;</div><span class="lb">投稿</span></button>
-    <button class="ni" onclick="go('dm')"><span class="ic">&#128172;</span><span class="lb">DM返信</span></button>
-    <button class="ni" onclick="go('cfg')"><span class="ic">&#9881;&#65039;</span><span class="lb">設定</span></button>
+    <button class="ni" onclick="go('db')"><span class="lb">ホーム</span></button>
+    <button class="ni" onclick="go('dm')"><span class="lb">DM</span></button>
+    <button class="npc" onclick="go('post')"><div class="npc-c">+</div><span class="lb">投稿</span></button>
+    <button class="ni on" onclick="go('cal')"><span class="lb">カレンダー</span></button>
+    <button class="ni" onclick="go('cfg')"><span class="lb">設定</span></button>
   </nav>
 </div>
 
-<!-- ANALYSIS -->
-<div id="sc-an" class="sc">
+<!-- ===== FOLLOWER ===== -->
+<div id="sc-fol" class="sc">
   <div class="hdr">
-    <button class="bk" onclick="go('db')">←</button>
-    <div class="htitle">AI分析</div>
+    <button class="bk" onclick="go('db')">&#8592;</button>
+    <div class="htitle">フォロワー戦略</div>
     <div style="width:30px"></div>
   </div>
   <div class="sb"><div class="ct">
-    <div class="plb"><span>★</span><span>プレミアムプラン</span></div>
-    <div class="cgold" style="border-radius:var(--r);padding:12px;margin-bottom:12px">
-      <div style="font-size:9px;color:var(--gold);letter-spacing:.06em;margin-bottom:5px;font-family:var(--mono)">🏆 今月の最強パターン</div>
-      <div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:4px">「女の子紹介」×@stella_shinjuku_official × 夜21時</div>
-      <div style="font-size:11px;color:var(--txt2);line-height:1.65">今月のDM問い合わせの<strong style="color:var(--gold)">68%</strong>がこのパターンから</div>
+    <div class="sec">SNS別フォロワー数</div>
+    <div class="card" style="padding:13px;margin-bottom:14px">
+      <div class="br2"><div class="blb">𝕏 Twitter</div><div class="btr"><div class="bfl" style="width:75%"></div></div><div class="bpc">1,240</div></div>
+      <div class="br2"><div class="blb">Instagram</div><div class="btr"><div class="bfl" style="width:55%"></div></div><div class="bpc">890</div></div>
+      <div class="br2"><div class="blb">Threads</div><div class="btr"><div class="bfl" style="width:25%"></div></div><div class="bpc">380</div></div>
+      <div class="br2" style="margin:0"><div class="blb">Bluesky</div><div class="btr"><div class="bfl" style="width:8%"></div></div><div class="bpc">120</div></div>
     </div>
-    <div class="sec">テンプレ別　応募獲得率</div>
+    <div class="sec">ハッシュタグ最適化</div>
     <div class="card">
-      <div class="br2"><div class="blb">女の子紹介</div><div class="btr"><div class="bfl g" style="width:85%"></div></div><div class="bpc">85%</div></div>
-      <div class="br2"><div class="blb">稼げる訴求</div><div class="btr"><div class="bfl g" style="width:72%"></div></div><div class="bpc">72%</div></div>
-      <div class="br2"><div class="blb">緊急速報</div><div class="btr"><div class="bfl" style="width:58%"></div></div><div class="bpc">58%</div></div>
-      <div class="br2"><div class="blb">店舗の雰囲気</div><div class="btr"><div class="bfl" style="width:44%"></div></div><div class="bpc">44%</div></div>
-      <div class="br2" style="margin:0"><div class="blb">求人募集</div><div class="btr"><div class="bfl gd" style="width:30%"></div></div><div class="bpc">30%</div></div>
+      <select id="ht-genre" class="sinp" style="margin-bottom:8px"><option>デリバリーヘルス</option><option>ソープランド</option><option>キャバクラ</option><option>メンズエステ</option></select>
+      <input id="ht-area" class="sinp" placeholder="エリア（例：新宿）" style="margin-bottom:10px">
+      <button class="btn" id="ht-btn" onclick="genHashtags()" style="padding:12px;font-size:13px;margin-bottom:0">ハッシュタグを生成する</button>
+      <div id="ht-loading" style="display:none;font-size:12px;color:var(--txt3);padding:10px 0;text-align:center">生成中...</div>
+      <div id="ht-result" style="display:none;margin-top:12px">
+        <div style="font-size:11px;color:var(--txt3);margin-bottom:8px">推奨ハッシュタグ</div>
+        <div id="ht-tags" style="font-size:13px;color:var(--txt);line-height:2.2;background:rgba(255,255,255,0.04);border-radius:8px;padding:12px;margin-bottom:8px"></div>
+        <button class="bsm" id="ht-copy" onclick="cpHashtags()" style="width:100%;padding:11px">コピーする</button>
+      </div>
     </div>
-    <div class="sec">投稿時間帯の効果</div>
-    <div class="card">
-      <div class="chartv">
-        <div class="chc"><div class="chb b" style="height:20%"></div></div>
-        <div class="chc"><div class="chb b" style="height:35%"></div></div>
-        <div class="chc"><div class="chb b" style="height:45%"></div></div>
-        <div class="chc"><div class="chb" style="height:100%"></div></div>
-        <div class="chc"><div class="chb" style="height:80%"></div></div>
-      </div>
-      <div style="display:flex;gap:4px;margin-bottom:5px">
-        <div class="chc"><div class="chl">朝</div></div><div class="chc"><div class="chl">昼</div></div>
-        <div class="chc"><div class="chl">夕方</div></div><div class="chc"><div class="chl">夜</div></div>
-        <div class="chc"><div class="chl">深夜</div></div>
-      </div>
-      <div style="font-size:10px;color:var(--txt3)">夜20〜22時の投稿がDM問い合わせを最大化</div>
-    </div>
-    <div class="sec">アカウント別 成果比較</div>
-    <div class="card">
-      <div class="br2"><div class="blb">@ea_trader</div><div class="btr"><div class="bfl g" style="width:88%"></div></div><div class="bpc">応募 12件</div></div>
-      <div class="br2"><div class="blb">@fx_signals</div><div class="btr"><div class="bfl" style="width:60%"></div></div><div class="bpc">応募 8件</div></div>
-      <div class="br2" style="margin:0"><div class="blb">@gold_ea</div><div class="btr"><div class="bfl gd" style="width:40%"></div></div><div class="bpc">応募 5件</div></div>
-    </div>
-    <div class="aa" onclick="go('post')"><div class="aa-i">🎯</div><div style="flex:1"><div class="aa-t">今夜21時に「女の子紹介」を投稿</div><div class="aa-s">応募数最大化パターンで全SNS配信</div></div><div class="aa-a">›</div></div>
-  </div></div>
-  <nav class="nav">
-    <button class="ni" onclick="go('db')"><span class="ic">&#127968;</span><span class="lb">ホーム</span></button>
-    <button class="ni" onclick="go('cal')"><span class="ic">&#128197;</span><span class="lb">カレンダー</span></button>
-    <button class="npc" onclick="go('post')"><div class="npc-c">&#10022;</div><span class="lb">投稿</span></button>
-    <button class="ni" onclick="go('dm')"><span class="ic">&#128172;</span><span class="lb">DM返信</span></button>
-    <button class="ni" onclick="go('cfg')"><span class="ic">&#9881;&#65039;</span><span class="lb">設定</span></button>
-  </nav>
-</div>
-
-<!-- DM -->
-<div id="sc-dm" class="sc">
-  <div class="hdr">
-    <button class="bk" onclick="go('db')">←</button>
-    <div class="htitle">DM返信サポート</div>
-    <div style="width:30px"></div>
-  </div>
-  <div class="sb"><div class="ct">
-    <div style="font-size:11px;color:var(--txt2);margin-bottom:12px">コピーして貼るだけ。<strong style="color:var(--green)">成約率を最大化する返信テンプレ。</strong></div>
-    <div class="sec">クローズテンプレ</div>
-    <div class="dmc"><span class="dmt">初めての問い合わせ</span><div class="dmx">はじめまして😊 ご連絡ありがとうございます！未経験の方も大歓迎で、丁寧にサポートしますので安心してください。まずはお気軽にご質問くださいね♪</div><button class="bcpy" id="c1" onclick="doCp(this,'はじめまして😊 ご連絡ありがとうございます！未経験の方も大歓迎で、丁寧にサポートしますので安心してください。まずはお気軽にご質問くださいね♪')">📋 コピーする</button></div>
-    <div class="dmc"><span class="dmt">給与について聞かれた</span><div class="dmx">給与は稼働次第ですが、月60〜120万円稼いでいるスタッフが多いです💰 初月から高収入を目指せます！詳しくはLINEでご説明します😊</div><button class="bcpy" id="c2" onclick="doCp(this,'給与は稼働次第ですが、月60〜120万円稼いでいるスタッフが多いです💰 初月から高収入を目指せます！詳しくはLINEでご説明します😊')">📋 コピーする</button></div>
-    <div class="dmc"><span class="dmt">体験入店を誘う</span><div class="dmx">体験入店から始められます✨ 強制は一切ないので、雰囲気を見るだけでもOKです。ご希望の日時を教えてください😊</div><button class="bcpy" id="c3" onclick="doCp(this,'おっしゃる通り、安くはないです。でも月収30万円のEAに月5万円の価値はあると思いませんか？')">📋 コピーする</button></div>
-    <div class="dmc"><span class="dmt">不安・怖いと言われた</span><div class="dmx">不安な気持ち、すごくわかります😊 うちのスタッフも最初はそうでした。今は楽しく稼いでいます！まず話だけでも聞いてみませんか？</div><button class="bcpy" id="c4" onclick="doCp(this,'不安な気持ち、すごくわかります😊 うちのスタッフも最初はそうでした。今は楽しく稼いでいます！まず話だけでも聞いてみませんか？')">📋 コピーする</button></div>
-    <div class="dv"></div>
-    <div class="sec">AIでカスタム返信を作る</div>
-    <div style="font-size:10px;color:var(--txt3);margin-bottom:8px">受信したDMをそのまま貼り付けてください。AIが最適な返信文を生成します。</div>
-    <textarea class="sinp" id="dm-input" rows="4" placeholder="例：リスクが心配です。本当に稼げるんですか？損したらどうするんですか。" style="resize:none;margin-bottom:9px"></textarea>
-    <button class="btn" id="dm-gen-btn" onclick="genDmReply()" style="padding:12px;margin-bottom:12px">✦ AIで返信文を生成する</button>
-
-    <div id="dm-result" style="display:none">
-      <div class="sec">生成された返信文</div>
-      <div id="dm-loading" style="display:flex;align-items:center;gap:8px;color:var(--txt3);font-size:11px;padding:12px;background:var(--card2);border-radius:var(--rsm);margin-bottom:10px">
-        <span class="spin">⟳</span><span>AIが返信文を生成中...</span>
-      </div>
-      <div id="dm-output" style="display:none;background:var(--card2);border:0.5px solid var(--bdr2);border-radius:var(--rsm);padding:12px;margin-bottom:10px;font-size:12px;line-height:1.8;color:var(--txt);white-space:pre-wrap"></div>
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button class="bcpy" id="dm-copy-btn" onclick="doCpDm()" style="flex:1;justify-content:center">📋 コピーする</button>
-        <button class="btn-tone" onclick="regenDm()" style="flex:1">🔄 別パターン</button>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
-        <span style="font-size:9px;color:var(--txt3)">トーン調整：</span>
-        <button class="btn-tone" onclick="adjustDm('もっと押しの強い、クロージング重視の')">💪 もっと押す</button>
-        <button class="btn-tone" onclick="adjustDm('より信頼感・誠実さを重視した')">🤝 信頼感UP</button>
-        <button class="btn-tone" onclick="adjustDm('短く簡潔な、50文字以内の')">✂️ 短くする</button>
+    <div class="sec">AIが提案するTOP3</div>
+    <div class="card" style="background:var(--pkd);border-color:var(--pkb)">
+      <div style="font-size:13px;color:var(--txt);line-height:2.2">
+        <div style="padding:5px 0;border-bottom:0.5px solid var(--bdr)">1. 毎日21時に「女の子紹介」を投稿する</div>
+        <div style="padding:5px 0;border-bottom:0.5px solid var(--bdr)">2. 人気アカウントの投稿にリプライする</div>
+        <div style="padding:5px 0">3. ハッシュタグを5〜7個に絞る</div>
       </div>
     </div>
   </div></div>
   <nav class="nav">
-    <button class="ni" onclick="go('db')"><span class="ic">&#127968;</span><span class="lb">ホーム</span></button>
-    <button class="ni" onclick="go('cal')"><span class="ic">&#128197;</span><span class="lb">カレンダー</span></button>
-    <button class="npc" onclick="go('post')"><div class="npc-c">&#10022;</div><span class="lb">投稿</span></button>
-    <button class="ni on" onclick="go('dm')"><span class="ic">&#128172;</span><span class="lb">DM返信</span></button>
-    <button class="ni" onclick="go('cfg')"><span class="ic">&#9881;&#65039;</span><span class="lb">設定</span></button>
+    <button class="ni" onclick="go('db')"><span class="lb">ホーム</span></button>
+    <button class="ni" onclick="go('dm')"><span class="lb">DM</span></button>
+    <button class="npc" onclick="go('post')"><div class="npc-c">+</div><span class="lb">投稿</span></button>
+    <button class="ni" onclick="go('cal')"><span class="lb">カレンダー</span></button>
+    <button class="ni" onclick="go('cfg')"><span class="lb">設定</span></button>
   </nav>
 </div>
 
-<!-- SETTINGS -->
+<!-- ===== SETTINGS ===== -->
 <div id="sc-cfg" class="sc">
   <div class="hdr">
-    <div><div class="logo">NOCTIS</div><div class="logo-s">&#35373;&#23450;</div></div>
+    <div><div class="logo">NOCTIS</div><div class="logo-s">設定</div></div>
     <div style="width:30px"></div>
   </div>
   <div class="sb"><div class="ct">
-    <div class="plb"><span>&#9733;</span><span>&#12503;&#12524;&#12511;&#12450;&#12512;&#12503;&#12521;&#12531; &#165;9,800/&#26376;</span></div>
-
-    <!-- ACCOUNT MANAGEMENT -->
-    <div class="sec">&#12450;&#12459;&#12454;&#12531;&#12488;&#31649;&#29702;</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="font-size:11px;color:var(--txt3)" id="cfg-ac-count">0 / 10&#12450;&#12459;&#12454;&#12531;&#12488;</div>
-      <button class="btn" style="width:auto;padding:6px 14px;font-size:11px" onclick="openAddAcModal()">&#65291; &#36861;&#21152;</button>
-    </div>
-    <div id="cfg-aclist"></div>
-
-    <div class="dv"></div>
-
-    <!-- PROFILE -->
-    <div class="sec">&#12503;&#12525;&#12501;&#12451;&#12540;&#12523;</div>
-    <div class="srow"><div class="srl">&#34920;&#31034;&#21517;</div><input class="sinp" value="EA Trader Pro"></div>
-    <div class="srow"><div class="srl">&#36009;&#22770;EA&#21517;</div><input class="sinp" value="USDJPY Scalper v3"></div>
-    <div class="srow"><div class="srl">&#26376;&#38291;&#30446;&#27161;&#21033;&#30410;</div><input class="sinp" value="500,000&#20870;"></div>
-
-    <div class="dv"></div>
-
-    <!-- AUTOMATION -->
-    <div class="sec">&#33258;&#21205;&#21270;&#35373;&#23450;</div>
-    <div class="trow"><div><div class="tn">&#33258;&#21205;&#25295;&#31295;&#12473;&#12465;&#12472;&#12517;&#12540;&#12523;</div><div class="ts">AI&#12364;&#26368;&#36969;&#306A;&#26178;&#38291;&#306B;&#20840;&#12450;&#12459;&#12454;&#12531;&#12488;&#37197;&#20449;</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></div></div>
-    <div class="trow"><div><div class="tn">&#35215;&#32004;&#12481;&#12455;&#12483;&#12463;&#33258;&#21205;&#12473;&#12461;&#12515;&#12531;</div><div class="ts">BAN&#12522;&#12473;&#12463;&#12434;&#20107;&#21069;&#12395;&#26908;&#20986;</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></div></div>
-    <div class="trow"><div><div class="tn">DM&#30528;&#20449;&#36890;&#30693;</div><div class="ts">&#21839;&#12356;&#21512;&#12431;&#12379;&#12434;&#21363;&#26178;&#12503;&#12483;&#12471;&#12517;&#36890;&#30693;</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></div></div>
-    <div class="trow"><div><div class="tn">&#36�;&#27425;&#12524;&#12509;&#12540;&#12488;</div><div class="ts">&#27611;&#36650;&#26376;&#26332;&#12395;&#25104;&#26524;&#12524;&#12509;&#12540;&#12488;&#12434;&#36865;&#20449;</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></div></div>
-
-    <div style="height:14px"></div>
-    <button class="bsm" style="width:100%;padding:12px;margin-bottom:7px">&#22793;&#26356;&#12434;&#20445;&#23384;&#12377;&#12427;</button>
-    <div style="text-align:center;font-size:9px;color:var(--txt3);padding-top:5px;font-family:var(--mono)">NOCTIS v1.0.0 &#8212; 夜職求人 AI MANAGER</div>
-  </div></div>
-
-  <!-- ADD ACCOUNT MODAL -->
-  <div id="addac-modal" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.78);z-index:50;align-items:flex-end">
-    <div style="background:var(--card);border-radius:20px 20px 0 0;padding:20px 18px 34px;width:100%">
-      <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:14px">&#12450;&#12459;&#12454;&#12531;&#12488;&#12434;&#36861;&#21152;</div>
-      <div class="srl" style="margin-bottom:4px">&#12503;&#12521;&#12483;&#12488;&#12501;&#12457;&#12540;&#12512;</div>
-      <select class="sinp" id="ac-platform" style="margin-bottom:10px">
-        <option value="x">&#120143; X (Twitter)</option>
-        <option value="threads">&#129309; Threads</option>
-        <option value="bluesky">&#129419; Bluesky</option>
-        <option value="note">&#128221; note</option>
-      </select>
-      <div class="srl" style="margin-bottom:4px">&#12450;&#12459;&#12454;&#12531;&#12488;&#21517; (@&#21517;)</div>
-      <input class="sinp" id="ac-handle" placeholder="@stella_shinjuku_official" style="margin-bottom:10px">
-      <div class="srl" style="margin-bottom:4px">&#29992;&#36884;&#12539;&#12513;&#12514;</div>
-      <input class="sinp" id="ac-memo" placeholder="&#20363;&#65306;&#12513;&#12452;&#12531;&#12450;&#12459;&#12454;&#12531;&#12488;" style="margin-bottom:10px">
-      <div class="srl" style="margin-bottom:4px">&#12501;&#12457;&#12525;&#12527;&#12540;&#25968;</div>
-      <input class="sinp" id="ac-fol" placeholder="10000" type="number" style="margin-bottom:16px">
-      <div style="display:flex;gap:8px">
-        <button class="bsm" style="flex:1;padding:12px" onclick="closeAddAcModal()">&#12461;&#12515;&#12531;&#12475;&#12523;</button>
-        <button class="btn" style="flex:2;padding:12px;font-size:13px" onclick="saveNewAc()">&#36861;&#21152;&#12377;&#12427;</button>
+    <div class="plb">&#9733; プレミアムプラン ¥9,800/月</div>
+    <div class="sec">SNS API連携</div>
+    <!-- X -->
+    <div class="sns-card">
+      <div class="sns-logo" style="background:#000;color:#fff;font-size:18px;font-family:var(--mono)">𝕏</div>
+      <div class="sns-info">
+        <div class="sns-name">X (Twitter)</div>
+        <div class="sns-handle">@stella_shinjuku_official</div>
+        <div class="sns-stat">1,240 フォロワー</div>
+      </div>
+      <div class="sns-status">
+        <span class="badge-conn">接続中</span>
+        <button class="bsm" style="font-size:11px;padding:4px 10px" onclick="showDisconnect('X')">解除</button>
       </div>
     </div>
-  </div>
+    <!-- Instagram -->
+    <div class="sns-card">
+      <div class="sns-logo" style="background:linear-gradient(135deg,#833AB4,#FD1D1D,#F77737);color:#fff;font-size:14px;font-weight:700">Ig</div>
+      <div class="sns-info">
+        <div class="sns-name">Instagram</div>
+        <div class="sns-handle">@stella_shinjuku</div>
+        <div class="sns-stat">890 フォロワー</div>
+      </div>
+      <div class="sns-status">
+        <span class="badge-conn">接続中</span>
+        <button class="bsm" style="font-size:11px;padding:4px 10px" onclick="showDisconnect('Instagram')">解除</button>
+      </div>
+    </div>
+    <!-- Threads -->
+    <div class="sns-card">
+      <div class="sns-logo" style="background:#000;color:#fff;font-size:20px">🧵</div>
+      <div class="sns-info">
+        <div class="sns-name">Threads</div>
+        <div class="sns-handle">@stella_shinjuku</div>
+        <div class="sns-stat">380 フォロワー</div>
+      </div>
+      <div class="sns-status">
+        <span class="badge-conn">接続中</span>
+        <button class="bsm" style="font-size:11px;padding:4px 10px" onclick="showDisconnect('Threads')">解除</button>
+      </div>
+    </div>
+    <!-- Bluesky -->
+    <div class="sns-card">
+      <div class="sns-logo" style="background:#0085FF;color:#fff;font-size:20px">🦋</div>
+      <div class="sns-info">
+        <div class="sns-name">Bluesky</div>
+        <div class="sns-handle" style="color:var(--txt3)">未接続</div>
+        <div class="sns-stat" style="color:var(--txt3)">無料で連携可能</div>
+      </div>
+      <div class="sns-status">
+        <button class="btn" style="width:auto;padding:7px 14px;font-size:12px" onclick="showConnect('Bluesky')">連携する</button>
+      </div>
+    </div>
 
+    <div class="dv"></div>
+    <div class="sec">店舗プロフィール</div>
+    <div class="srow"><div class="srl">店舗名</div><input class="sinp" value="Club Stella 新宿店"></div>
+    <div class="srow"><div class="srl">業種</div><input class="sinp" value="デリバリーヘルス"></div>
+    <div class="srow"><div class="srl">ターゲット月収</div><input class="sinp" value="50〜100万円"></div>
+    <div class="dv"></div>
+    <div class="sec">自動化設定</div>
+    <div class="trow"><div><div class="tn">自動投稿スケジュール</div><div class="ts">AIが最適な時間に全SNSへ自動配信</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
+    <div class="trow"><div><div class="tn">NGワード自動チェック</div><div class="ts">凍結リスクを事前にスキャン</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
+    <div class="trow"><div><div class="tn">DM着信通知</div><div class="ts">新着DMを即時プッシュ通知</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
+    <div class="trow"><div><div class="tn">週次レポート</div><div class="ts">毎週月曜に成果レポートを送信</div></div><button class="tog on" onclick="this.classList.toggle('on')"><div class="tog-t"></div></button></div>
+    <div style="height:14px"></div>
+    <button class="bsm" style="width:100%;padding:12px;margin-bottom:8px">変更を保存する</button>
+    <div style="text-align:center;font-size:10px;color:var(--txt3);padding-top:6px;font-family:var(--mono)">NOCTIS v4.0 — RECRUITMENT AI</div>
+  </div></div>
+  <!-- SNS CONNECT MODAL -->
+  <div id="sns-modal" class="modal-wrap">
+    <div class="modal-box">
+      <div style="font-size:15px;font-weight:700;color:var(--txt);margin-bottom:6px" id="sns-modal-ttl">SNSを連携する</div>
+      <div style="font-size:13px;color:var(--txt3);margin-bottom:16px" id="sns-modal-desc">OAuth認証でセキュアに接続します</div>
+      <div style="background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--rsm);padding:14px;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--txt3);margin-bottom:10px">連携すると以下が可能になります</div>
+        <div style="font-size:13px;color:var(--txt);line-height:2">
+          <div>&#10003; 投稿の直接送信</div>
+          <div>&#10003; DMの受信・閲覧</div>
+          <div>&#10003; フォロワー数の取得</div>
+        </div>
+      </div>
+      <button class="btn" style="margin-bottom:10px" onclick="doConnect()">OAuth認証で連携する</button>
+      <button class="bsm" style="width:100%;padding:12px" onclick="closeSnsModal()">キャンセル</button>
+    </div>
+  </div>
   <nav class="nav">
-    <button class="ni" onclick="go('db')"><span class="ic">&#127968;</span><span class="lb">ホーム</span></button>
-    <button class="ni" onclick="go('cal')"><span class="ic">&#128197;</span><span class="lb">カレンダー</span></button>
-    <button class="npc" onclick="go('post')"><div class="npc-c">&#10022;</div><span class="lb">投稿</span></button>
-    <button class="ni" onclick="go('dm')"><span class="ic">&#128172;</span><span class="lb">DM返信</span></button>
-    <button class="ni on" onclick="go('cfg')"><span class="ic">&#9881;&#65039;</span><span class="lb">設定</span></button>
+    <button class="ni" onclick="go('db')"><span class="lb">ホーム</span></button>
+    <button class="ni" onclick="go('dm')"><span class="lb">DM</span></button>
+    <button class="npc" onclick="go('post')"><div class="npc-c">+</div><span class="lb">投稿</span></button>
+    <button class="ni" onclick="go('cal')"><span class="lb">カレンダー</span></button>
+    <button class="ni on" onclick="go('cfg')"><span class="lb">設定</span></button>
   </nav>
 </div>
-</div>
+
+</div><!-- #app -->
 
 <script>
-const PM={ob:'pb-ob',db:'pb-db',post:'pb-post',cal:'pb-cal',an:'pb-an',dm:'pb-dm',cfg:'pb-cfg'};
-function go(n){
-  document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));
-  const el=document.getElementById('sc-'+n);
-  if(el){el.classList.add('on');const sb=el.querySelector('.sb');if(sb)sb.scrollTop=0;}
-  document.querySelectorAll('.pb').forEach(b=>b.classList.remove('on'));
-  const pb=document.getElementById(PM[n]);if(pb)pb.classList.add('on');
-}
-
-const posts={
-  '女の子紹介':'🌸【本日のおすすめキャスト】\n\n今日は笑顔が超かわいい20代の子が出勤中✨\n話しやすくて癒し系！リピーター続出の人気の子です💕\n\n体験入店も随時受付中🌙\nお気軽にDMどうぞ🙌\n\n#新宿 #未経験歓迎 #高収入',
-  '稼げる訴求':'💰【実際いくら稼げる？】\n\n先月の実績👇\n✅21歳・未経験 → 月78万円\n✅25歳・主婦 → 月55万円\n✅19歳・学生 → 月45万円\n\n未経験OKだから初月から稼げます🔥\n詳しくはDMへ！\n\n#高収入 #未経験OK #夜職',
-  '店舗の雰囲気':'✨【うちのお店ってどんなとこ？】\n\n女の子同士の仲がめちゃくちゃ良くて\nアットホームな雰囲気が自慢です🏠💕\n\nLINE追加で見学だけもOK👍\nまずは話だけ聞いてみて！\n\n#アットホーム #安心 #女性スタッフ在籍',
-  'スタッフ投稿':'👑【担当スタッフです！】\n\nはじめまして、スタッフの田中です😊\n不安なこと、なんでも相談してください。\n一人ひとりに合ったサポートを心がけています✨\n\n↓気軽にDMを！\n\n#相談無料 #安心サポート',
-  '求人募集':'📣【急募！スタッフ募集中】\n\n✅日払い・週払いOK\n✅未経験・副業・Wワーク大歓迎\n✅保証制度あり\n\n今なら入店特典あり🎁\n気になった方はすぐDMを！\n\n#急募 #日払い #副業OK #未経験歓迎',
-  '体験入店':'💆【体験入店 随時受付中】\n\n初めての方も安心してください😊\n当日の流れを丁寧に説明します。\n\n✅送迎あり\n✅即日体験OK\n✅強制なし・見学だけでもOK\n\nまずはDMで！\n\n#体験入店 #未経験歓迎 #安心'
-};
-const tones={
-  more:'🔥🔥 もっと稼げる訴求！\n\n先月トップの子は月収128万円💥\n未経験でも3ヶ月で月80万超えが続出🔥\n\n今すぐDMして！チャンスを逃すな。\n\n#高収入 #稼げる #夜職求人',
-  trust:'🌸 はじめまして😊\n\n初めての方も安心してください。\n丁寧にサポートする環境が整っています。\nまずはお気軽にお話だけでも💕\n\n#未経験歓迎 #安心 #相談無料',
-  urgent:'🚨【本日締切】残り2枠！\n\n今週の体験入店枠が残りわずかです。\n明日からは受け付けできません。\n\n今すぐDMを！\n\n#急募 #限定 #本日締切',
-  soft:'求人募集中。\n未経験・副業OK。\n日払い可。\n詳細はDMまで。\n\n#求人 #夜職 #未経験歓迎'
-};
-let curT='女の子紹介',genned=false;
-function sTmpl(el,n){document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));el.classList.add('on');curT=n;if(genned)shGen();}
-function doGen(){
-  const btn=document.getElementById('gbtn');btn.textContent='生成中...';btn.disabled=true;
-  document.getElementById('pdone').style.display='none';
-  document.getElementById('pres').style.display='block';
-  document.getElementById('gld').style.display='flex';
-  document.getElementById('gout').style.display='none';
-  setTimeout(()=>{shGen();btn.textContent='✦ AIで投稿を生成する';btn.disabled=false;genned=true;},1100);
-}
-function shGen(){
-  const c=posts[curT]||posts['女の子紹介'];
-  document.getElementById('gld').style.display='none';
-  const o=document.getElementById('gout');o.style.display='block';o.textContent=c;
-  document.getElementById('pct').textContent=c.replace(/\n/g,'').length+' / 140';
-  chkNG(c);bldConf();
-}
-function chkNG(t){
-  const el=document.getElementById('ngr');
-  el.className='ngok';
-  el.innerHTML='<span>✓</span><span>規約チェックOK　BANリスク：低</span>';
-}
-
-function adj(t){const c=tones[t]||posts[curT];document.getElementById('gout').textContent=c;document.getElementById('pct').textContent=c.replace(/\n/g,'').length+' / 140';}
-
-function rPost(){document.getElementById('pdone').style.display='none';document.getElementById('pres').style.display='none';genned=false;}
-function doCp(btn,text){
-  if(navigator.clipboard)navigator.clipboard.writeText(text).catch(()=>{});
-  btn.textContent='✓ コピーしました！';btn.classList.add('dn');
-  setTimeout(()=>{btn.textContent='📋 コピーする';btn.classList.remove('dn');},2000);
-}
-
-// ── DM AI REPLY ──
-let lastDmInput='',lastDmTone='';
-async function genDmReply(tone=''){
-  const input=document.getElementById('dm-input').value.trim();
-  if(!input){alert('受信したDMを入力してください');return;}
-  lastDmInput=input;lastDmTone=tone;
-  const btn=document.getElementById('dm-gen-btn');
-  btn.disabled=true;btn.textContent='生成中...';
-  document.getElementById('dm-result').style.display='block';
-  document.getElementById('dm-loading').style.display='flex';
-  document.getElementById('dm-output').style.display='none';
-  const toneText=tone ? tone+'トーンで、' : '';
-  const prompt=`あなたは風俗店舗の求人担当スタッフです。
-以下の見込み客からのDMに対して、${toneText}応募につながる返信文を日本語で生成してください。
-
-【受信したDM】
-${input}
-
-【条件】
-- 150文字以内
-- 絵文字を1〜2個使う
-- 相手の不安や疑問に共感してから回答する
-- 次のアクション（体験入店・LINE登録など）に誘導する
-- 押しつけがましくなく自然な会話口調
-- 返信文のみ出力し説明や前置きは一切不要`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
-    });
-    const data=await res.json();
-    const text=data.content?.[0]?.text||'生成に失敗しました。もう一度お試しください。';
-    document.getElementById('dm-loading').style.display='none';
-    const out=document.getElementById('dm-output');
-    out.style.display='block';out.textContent=text;
-  }catch(e){
-    document.getElementById('dm-loading').style.display='none';
-    const out=document.getElementById('dm-output');
-    out.style.display='block';out.textContent='エラーが発生しました。ネットワークを確認してください。';
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function go(n) {
+  document.querySelectorAll('.sc').forEach(function(s){ s.classList.remove('on'); });
+  var sc = document.getElementById('sc-' + n);
+  if (sc) {
+    sc.classList.add('on');
+    var sb = sc.querySelector('.sb');
+    if (sb) sb.scrollTop = 0;
   }
-  btn.disabled=false;btn.textContent='✦ AIで返信文を生成する';
-}
-function regenDm(){genDmReply(lastDmTone);}
-function adjustDm(tone){genDmReply(tone);}
-function doCpDm(){
-  const text=document.getElementById('dm-output').textContent;
-  if(navigator.clipboard)navigator.clipboard.writeText(text).catch(()=>{});
-  const btn=document.getElementById('dm-copy-btn');
-  btn.textContent='✓ コピーしました！';btn.classList.add('dn');
-  setTimeout(()=>{btn.textContent='📋 コピーする';btn.classList.remove('dn');},2000);
+  if (n === 'cal') setTimeout(renderCalendar, 50);
+  if (n === 'cfg' || n === 'post') setTimeout(renderPostGrid, 50);
+  if (n === 'dm') setTimeout(renderDmList, 50);
 }
 
+// ONBOARDING
+document.getElementById('ob-start').addEventListener('click', function(){ go('cfg'); });
+document.getElementById('ob-skip').addEventListener('click', function(){ go('db'); });
 
-// ── CALENDAR v2 ──
+// Dashboard date
 (function(){
-var SKEY='noctis_posts';
-var calY=new Date().getFullYear();
-var calM=new Date().getMonth();
-var selDate=null;
-var editId=null;
-var delId=null;
+  var d = new Date();
+  var el = document.getElementById('db-date');
+  if (el) el.textContent = d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日（' + ['日','月','火','水','木','金','土'][d.getDay()] + '）';
+})();
 
-function lp(){try{return JSON.parse(localStorage.getItem(SKEY)||'[]');}catch(e){return [];}}
-function sp(a){localStorage.setItem(SKEY,JSON.stringify(a));}
-function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+// ── SNS ACCOUNTS (demo data) ──────────────────────────────────────────────────
+var SNS_ACCOUNTS = [
+  {id:'a1', platform:'x',         handle:'@stella_shinjuku_official', label:'X',         icon:'𝕏',  connected:true,  followers:1240, active:true},
+  {id:'a2', platform:'instagram', handle:'@stella_shinjuku',          label:'Instagram', icon:'Ig', connected:true,  followers:890,  active:true},
+  {id:'a3', platform:'threads',   handle:'@stella_shinjuku',          label:'Threads',   icon:'🧵', connected:true,  followers:380,  active:false},
+  {id:'a4', platform:'bluesky',   handle:'未接続',                    label:'Bluesky',   icon:'🦋', connected:false, followers:0,    active:false}
+];
 
-function pad(n){return String(n).padStart(2,'0');}
-function ds(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d);}
-
-window.renderCalendar=function(){
-  var y=calY,m=calM;
-  var tEl=document.getElementById('cal-title');
-  if(tEl)tEl.textContent=y+'\u5e74 '+(m+1)+'\u6708';
-  var first=new Date(y,m,1).getDay();
-  var daysInMonth=new Date(y,m+1,0).getDate();
-  var posts=lp();
-  var now=new Date();
-  var todayStr=ds(now.getFullYear(),now.getMonth(),now.getDate());
-  var html='';
-  for(var i=0;i<first;i++){
-    var pd=new Date(y,m,0-(first-i-1)).getDate();
-    html+='<div class="cd oth">'+pd+'</div>';
-  }
-  for(var d=1;d<=daysInMonth;d++){
-    var dateStr=ds(y,m,d);
-    var dp=posts.filter(function(p){return p.date===dateStr;});
-    var isT=dateStr===todayStr;
-    var isS=dateStr===selDate;
-    var cls='cd'+(isT?' today':dp.length?' has':'');
-    var hasDone=dp.some(function(p){return p.status==='done';});
-    var hasSched=dp.some(function(p){return p.status==='scheduled';});
-    var dots='';
-    if(hasDone)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--green);display:inline-block;margin:0 1px"></span>';
-    if(hasSched)dots+='<span style="width:4px;height:4px;border-radius:50%;background:var(--blue);display:inline-block;margin:0 1px"></span>';
-    var outline=isS?'outline:1.5px solid var(--blue);border-radius:6px;':'';
-    html+='<div class="'+cls+'" data-date="'+dateStr+'" style="'+outline+'cursor:pointer">'+d+
-      (dots?'<div style="position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center">'+dots+'</div>':'')+
-    '</div>';
-  }
-  var grid=document.getElementById('cal-days');
-  if(!grid)return;
-  grid.innerHTML=html;
-  grid.onclick=function(e){
-    var el=e.target.closest?e.target.closest('[data-date]'):null;
-    if(!el&&e.target.dataset&&e.target.dataset.date)el=e.target;
-    if(el&&el.dataset.date)window.selectCalDate(el.dataset.date);
-  };
-  updateSummary(posts,y,m);
-  if(selDate)renderDatePanel(selDate);
-};
-
-window.changeMonth=function(dir){
-  calM+=dir;
-  if(calM>11){calM=0;calY++;}
-  if(calM<0){calM=11;calY--;}
-  selDate=null;
-  var dp=document.getElementById('date-panel');
-  var nm=document.getElementById('no-date-msg');
-  if(dp)dp.style.display='none';
-  if(nm)nm.style.display='block';
-  window.renderCalendar();
-};
-
-window.selectCalDate=function(dateStr){
-  selDate=dateStr;
-  var dp=document.getElementById('date-panel');
-  var nm=document.getElementById('no-date-msg');
-  var lbl=document.getElementById('sel-date-lbl');
-  if(dp)dp.style.display='block';
-  if(nm)nm.style.display='none';
-  if(lbl){
-    var pts=dateStr.split('-');
-    lbl.textContent=parseInt(pts[1])+'\u6708'+parseInt(pts[2])+'\u65e5\u306e\u6295\u7a3f';
-  }
-  renderDatePanel(dateStr);
-  window.renderCalendar();
-};
-
-function renderDatePanel(dateStr){
-  var posts=lp().filter(function(p){return p.date===dateStr;});
-  posts.sort(function(a,b){return a.time.localeCompare(b.time);});
-  var box=document.getElementById('date-posts');
-  if(!box)return;
-  if(!posts.length){
-    box.innerHTML='<div style="font-size:11px;color:var(--txt3);padding:8px 0">\u3053\u306e\u65e5\u306e\u6295\u7a3f\u306f\u3042\u308a\u307e\u305b\u3093</div>';
+function renderPostGrid() {
+  var box = document.getElementById('post-ac-grid');
+  if (!box) return;
+  var connected = SNS_ACCOUNTS.filter(function(a){ return a.connected; });
+  if (!connected.length) {
+    box.innerHTML = '<div style="color:var(--txt3);font-size:13px;padding:8px 0;grid-column:span 3">設定からSNSを連携してください</div>';
     return;
   }
-  var h=posts.map(function(p){
-    var tcls=p.status==='done'?'tg-g':'tg-b';
-    var tlbl=p.status==='done'?'\u6295\u7a3f\u6e08\u307f':'\u4e88\u7d04\u4e2d';
-    var prev=p.text.replace(/\n/g,' ').slice(0,55)+(p.text.length>55?'\u2026':'');
-    return '<div style="padding:10px;background:var(--card2);border-radius:var(--rsm);margin-bottom:8px;border:0.5px solid var(--bdr)">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'+
-        '<div style="display:flex;align-items:center;gap:5px">'+
-          '<span class="stt">'+p.time+'</span>'+
-          '<span class="stg '+tcls+'">'+tlbl+'</span>'+
-          '<span class="stg tg-gd" style="font-size:9px">'+p.tmpl+'</span>'+
-        '</div>'+
-        '<div style="display:flex;gap:5px">'+
-          '<button class="bsm" style="padding:3px 8px;font-size:10px" data-edit="'+p.id+'">\u7de8\u96c6</button>'+
-          '<button class="bsm" style="padding:3px 8px;font-size:10px;border-color:var(--rdb);color:var(--red)" data-del="'+p.id+'">\u524a\u9664</button>'+
-        '</div>'+
-      '</div>'+
-      '<div style="font-size:11px;color:var(--txt2);line-height:1.5">'+prev+'</div>'+
-    '</div>';
+  box.innerHTML = connected.map(function(a){
+    return '<div data-acid="'+a.id+'" class="accard'+(a.active?' sel':'')+'">' +
+      '<div class="acchk">✓</div>' +
+      '<div class="ac-ico">'+a.icon+'</div>' +
+      '<div class="ac-name">'+a.label+'</div>' +
+      '<div class="ac-plat">'+a.handle+'</div>' +
+      '</div>';
   }).join('');
-  box.innerHTML=h;
-  box.onclick=function(e){
-    var eb=e.target.closest?e.target.closest('[data-edit]'):null;
-    var db=e.target.closest?e.target.closest('[data-del]'):null;
-    if(!eb&&e.target.dataset&&e.target.dataset.edit)eb=e.target;
-    if(!db&&e.target.dataset&&e.target.dataset.del)db=e.target;
-    if(eb&&eb.dataset.edit)window.calEditPost(eb.dataset.edit);
-    if(db&&db.dataset.del)window.calDeletePost(db.dataset.del);
+  box.onclick = function(e) {
+    var card = e.target.closest('[data-acid]');
+    if (!card) return;
+    var ac = SNS_ACCOUNTS.find(function(a){ return a.id === card.dataset.acid; });
+    if (ac) { ac.active = !ac.active; renderPostGrid(); bldConf(); }
+  };
+  bldConf();
+}
+
+function bldConf() {
+  var box = document.getElementById('mpc');
+  if (!box) return;
+  var active = SNS_ACCOUNTS.filter(function(a){ return a.active && a.connected; });
+  box.innerHTML = active.map(function(a){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--bdr)">' +
+      '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt)"><span>'+a.icon+'</span>'+a.label+' ('+a.handle+')</div>' +
+      '<span class="stg tg-p">送信予定</span></div>';
+  }).join('') || '<div style="color:var(--txt3);font-size:13px;padding:7px 0">SNSが選択されていません</div>';
+}
+
+// ── DM INBOX (demo data) ──────────────────────────────────────────────────────
+var DM_DATA = [
+  {id:'d1', platform:'x', icon:'𝕏', name:'りな',    handle:'@rina_0823',  preview:'体験入店って当日でも大丈夫ですか？', time:'14:32', unread:true,
+   messages:[{from:'user',text:'体験入店って当日でも大丈夫ですか？顔出しは必要ですか？',time:'14:32'},{from:'me',text:'はじめまして！当日体験も大丈夫です。顔出しは不要ですよ。まずはお気軽にお話しましょう',time:'14:33'}]},
+  {id:'d2', platform:'x', icon:'𝕏', name:'あいか',   handle:'@aika_work',  preview:'給料って実際どのくらいもらえますか', time:'12:18', unread:true,
+   messages:[{from:'user',text:'給料って実際どのくらいもらえますか？未経験でも大丈夫ですか？',time:'12:18'}]},
+  {id:'d3', platform:'ig', icon:'Ig', name:'まや',   handle:'@maya_job',   preview:'副業でも大丈夫ですか？本業があって', time:'10:05', unread:true,
+   messages:[{from:'user',text:'副業でも大丈夫ですか？本業があって週2〜3日しか入れないのですが',time:'10:05'}]},
+  {id:'d4', platform:'x', icon:'𝕏', name:'ゆうか',  handle:'@yuka_2626',  preview:'ありがとうございます！では明日…', time:'昨日',  unread:false,
+   messages:[{from:'me',text:'体験入店の詳細をお送りします！'},  {from:'user',text:'ありがとうございます！では明日15時にお願いします。'}]},
+  {id:'d5', platform:'ig', icon:'Ig', name:'なつみ', handle:'@natsumi_m',  preview:'考えてみます！またご連絡します', time:'昨日',  unread:false,
+   messages:[{from:'user',text:'詳しく教えてください'},{from:'me',text:'もちろんです！どんなことでも聞いてください'},{from:'user',text:'考えてみます！またご連絡します'}]},
+  {id:'d6', platform:'x', icon:'𝕏', name:'さくら',  handle:'@sakura_job', preview:'未経験なので少し不安です…', time:'2日前', unread:false,
+   messages:[{from:'user',text:'未経験なので少し不安です…でも興味あります'}]},
+];
+
+var currentDmFilter = 'all';
+var currentDmId = null;
+
+function filterDm(f) {
+  currentDmFilter = f;
+  document.querySelectorAll('[id^="dm-filter-"]').forEach(function(b){
+    b.style.borderColor = ''; b.style.color = '';
+  });
+  var btn = document.getElementById('dm-filter-'+f);
+  if (btn) { btn.style.borderColor = 'var(--pkb)'; btn.style.color = 'var(--pk2)'; }
+  renderDmList();
+}
+
+function renderDmList() {
+  var box = document.getElementById('dm-list');
+  if (!box) return;
+  var list = DM_DATA.filter(function(d){
+    if (currentDmFilter === 'x') return d.platform === 'x';
+    if (currentDmFilter === 'ig') return d.platform === 'ig';
+    return true;
+  });
+  box.innerHTML = list.map(function(d){
+    return '<div class="dm-thread'+(d.unread?' unread':'')+'" data-dmid="'+d.id+'">' +
+      '<div class="dm-avatar" style="background:'+(d.platform==='x'?'#000':'linear-gradient(135deg,#833AB4,#FD1D1D)')+';color:#fff">'+d.icon+'</div>' +
+      '<div class="dm-info">' +
+        '<div class="dm-name">'+d.name+' <span style="font-size:11px;color:var(--txt3);font-weight:400">'+d.handle+'</span></div>' +
+        '<div class="dm-preview">'+d.preview+'</div>' +
+      '</div>' +
+      '<div class="dm-meta"><span class="dm-time">'+d.time+'</span>'+(d.unread?'<div class="dm-unread-dot"></div>':'')+'</div>' +
+      '</div>';
+  }).join('');
+  box.onclick = function(e) {
+    var th = e.target.closest('[data-dmid]');
+    if (th) openDmDetail(th.dataset.dmid);
   };
 }
 
-function updateSummary(posts,y,m){
-  var ms=y+'-'+pad(m+1);
-  var mp=posts.filter(function(p){return p.date.indexOf(ms)===0;});
+function openDmDetail(id) {
+  var dm = DM_DATA.find(function(d){ return d.id === id; });
+  if (!dm) return;
+  currentDmId = id;
+  dm.unread = false;
+  document.getElementById('dm-detail-name').textContent = dm.name;
+  document.getElementById('dm-detail-plat').textContent = dm.platform === 'x' ? 'X (Twitter)' : 'Instagram';
+  var msgBox = document.getElementById('dm-messages');
+  msgBox.innerHTML = dm.messages.map(function(m){
+    var isOut = m.from === 'me';
+    return '<div style="display:flex;flex-direction:column;align-items:'+(isOut?'flex-end':'flex-start')+'">' +
+      '<div class="msg-time">'+(m.time||'')+'</div>' +
+      '<div class="msg-bubble '+(isOut?'msg-out':'msg-in')+'">'+m.text+'</div>' +
+      '</div>';
+  }).join('');
+  setTimeout(function(){ msgBox.scrollTop = msgBox.scrollHeight; }, 50);
+  document.getElementById('dm-ai-reply').style.display = 'none';
+  document.getElementById('dm-reply-input').value = '';
+  go('dm-detail');
+}
+
+function sendDmReply() {
+  var input = document.getElementById('dm-reply-input');
+  var text = input.value.trim();
+  if (!text) return;
+  var dm = DM_DATA.find(function(d){ return d.id === currentDmId; });
+  if (!dm) return;
+  dm.messages.push({from:'me', text:text, time:'今'});
+  var msgBox = document.getElementById('dm-messages');
+  var div = document.createElement('div');
+  div.style.display = 'flex'; div.style.flexDirection = 'column'; div.style.alignItems = 'flex-end';
+  div.innerHTML = '<div class="msg-time">今</div><div class="msg-bubble msg-out">'+text+'</div>';
+  msgBox.appendChild(div);
+  input.value = '';
+  document.getElementById('dm-ai-reply').style.display = 'none';
+  setTimeout(function(){ msgBox.scrollTop = msgBox.scrollHeight; }, 50);
+  // Show toast
+  showToast('送信しました（デモ）');
+}
+
+var aiReplyText = '';
+async function genAiReply() {
+  var dm = DM_DATA.find(function(d){ return d.id === currentDmId; });
+  if (!dm) return;
+  var lastMsg = dm.messages.filter(function(m){ return m.from === 'user'; }).pop();
+  if (!lastMsg) return;
+  var replyBox = document.getElementById('dm-ai-reply');
+  replyBox.style.display = 'block';
+  replyBox.textContent = '生成中...';
+  var prompt = 'あなたは風俗店舗の求人担当スタッフです。\n以下の見込み客からのDMに対して、応募につながる返信文を150文字以内で生成してください。\n親しみやすい口調、相手の不安に共感、次のアクションに誘導。\n返信文のみ出力してください。\n\n【DM】\n' + lastMsg.text;
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})
+    });
+    var data = await res.json();
+    aiReplyText = data.content?.[0]?.text || '生成に失敗しました';
+    replyBox.textContent = aiReplyText;
+  } catch(e) {
+    aiReplyText = '生成に失敗しました';
+    replyBox.textContent = aiReplyText;
+  }
+}
+
+function useAiReply() {
+  if (aiReplyText) {
+    document.getElementById('dm-reply-input').value = aiReplyText;
+    document.getElementById('dm-ai-reply').style.display = 'none';
+  }
+}
+
+// ── POST CREATION ─────────────────────────────────────────────────────────────
+var curTmpl = '女の子紹介';
+var POSTS = {
+  '女の子紹介': '本日のおすすめキャスト！今日は笑顔がかわいい20代の子が出勤中 話しやすくて癒し系 リピーター続出の人気の子です 体験入店も随時受付中\n#新宿 #未経験歓迎 #高収入',
+  '稼げる訴求': '実際いくら稼げる？先月の実績 21歳・未経験で月78万円 25歳・主婦で月55万円 未経験OKだから初月から稼げます\n#高収入 #未経験OK #夜職',
+  '店舗の雰囲気': 'うちのお店はアットホームな雰囲気が自慢です 女の子同士の仲がよくて働きやすいと好評 LINE追加で見学だけもOK\n#アットホーム #安心 #新宿',
+  'スタッフ投稿': '担当スタッフの田中です 不安なことはなんでも相談してください 一人ひとりに合ったサポートを心がけています\n#相談無料 #安心サポート',
+  '求人募集': '急募！スタッフ募集中 日払い・週払いOK 未経験・副業・Wワーク大歓迎 保証制度あり\n#急募 #日払い #未経験歓迎',
+  '体験入店': '体験入店随時受付中 初めての方も安心してください 送迎あり・即日体験OK・強制なし\n#体験入店 #未経験歓迎 #安心'
+};
+
+function selTmpl(el, name) {
+  document.querySelectorAll('.tc').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on'); curTmpl = name;
+}
+
+async function doGen() {
+  var btn = document.getElementById('gbtn');
+  var kw = (document.getElementById('kw-input').value || '').trim();
+  btn.disabled = true; btn.textContent = '生成中...';
+  document.getElementById('pdone').style.display = 'none';
+  document.getElementById('pres').style.display = 'block';
+  document.getElementById('gen-loading').style.display = 'flex';
+  var ta = document.getElementById('gen-ta'); ta.value = '';
+  var kwText = kw ? 'キーワード：' + kw + '\n\n' : '';
+  var prompt = 'あなたは風俗店舗の求人担当スタッフです。\nX（Twitter）の求人投稿文を1つ生成してください。\n\nテンプレ：' + curTmpl + '\n' + kwText +
+    '条件：\n- 280文字以内\n- 親しみやすい口調\n- ハッシュタグを3〜5個含める\n- 凍結リスクの高い単語は使わない\n- 投稿文のみ出力、説明や前置きは不要';
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    var data = await res.json();
+    var text = data.content?.[0]?.text || POSTS[curTmpl] || '';
+    document.getElementById('gen-loading').style.display = 'none';
+    ta.value = text; updPct();
+  } catch(e) {
+    document.getElementById('gen-loading').style.display = 'none';
+    ta.value = POSTS[curTmpl] || ''; updPct();
+  }
+  bldConf();
+  btn.disabled = false; btn.textContent = 'AIで投稿文を生成する';
+}
+
+async function adjTone(tone) {
+  var ta = document.getElementById('gen-ta');
+  var base = ta.value || POSTS[curTmpl] || '';
+  var instrMap = {more:'もっと過激で煽り強く',trust:'優しく安心感ある表現に',urgent:'緊急感と限定感を強調',soft:'短くシンプルに'};
+  document.getElementById('gen-loading').style.display = 'flex';
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:'以下の投稿文を「'+instrMap[tone]+'」に修正してください。280文字以内。投稿文のみ出力。\n\n'+base}]})
+    });
+    var data = await res.json();
+    document.getElementById('gen-loading').style.display = 'none';
+    ta.value = data.content?.[0]?.text || base; updPct();
+  } catch(e) { document.getElementById('gen-loading').style.display = 'none'; }
+}
+
+function updPct() {
+  var ta = document.getElementById('gen-ta');
+  var el = document.getElementById('pct');
+  if (ta && el) el.textContent = (ta.value.replace(/\n/g,'').length) + ' / 280';
+}
+
+function doPost() {
+  var active = SNS_ACCOUNTS.filter(function(a){ return a.active && a.connected; });
+  var names = active.map(function(a){ return a.label; });
+  document.getElementById('pres').style.display = 'none';
+  document.getElementById('ddet').textContent = (names.length ? names.join('・') : '選択なし') + ' に投稿しました。\n（デモ：実際のAPI連携時に送信されます）';
+  document.getElementById('pdone').style.display = 'block';
+  if (names.length) showToast(names.join('・') + ' に投稿しました');
+}
+
+function resetPost() {
+  document.getElementById('pdone').style.display = 'none';
+  document.getElementById('pres').style.display = 'none';
+  var ta = document.getElementById('gen-ta'); if (ta) ta.value = '';
+  var kw = document.getElementById('kw-input'); if (kw) kw.value = '';
+  updPct();
+}
+
+document.getElementById('gen-ta').addEventListener('input', updPct);
+
+// ── CALENDAR ──────────────────────────────────────────────────────────────────
+var CAL_KEY = 'noctis_posts';
+var calY = new Date().getFullYear(), calM = new Date().getMonth();
+var selDate = null, calEditId = null, calDelId = null;
+
+function loadCal() { try { return JSON.parse(localStorage.getItem(CAL_KEY)||'[]'); } catch(e) { return []; } }
+function saveCal(p) { localStorage.setItem(CAL_KEY, JSON.stringify(p)); }
+function calId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function pad2(n) { return String(n).padStart(2,'0'); }
+function dStr(y,m,d) { return y+'-'+pad2(m+1)+'-'+pad2(d); }
+
+function renderCalendar() {
+  var y=calY,m=calM;
+  var t = document.getElementById('cal-title');
+  if (t) t.textContent = y+'年 '+(m+1)+'月';
+  var first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  var posts=loadCal();
+  var today=new Date(), todayStr=dStr(today.getFullYear(),today.getMonth(),today.getDate());
+  var html='';
+  for(var i=0;i<first;i++) html+='<div class="cd oth">'+new Date(y,m,-first+i+1).getDate()+'</div>';
+  for(var d=1;d<=days;d++){
+    var ds=dStr(y,m,d), dp=posts.filter(function(p){return p.date===ds;});
+    var isTd=ds===todayStr, isSel=ds===selDate;
+    var cls='cd'+(isTd?' today':dp.length?' has':'');
+    var hasDone=dp.some(function(p){return p.status==='done';}), hasSched=dp.some(function(p){return p.status==='scheduled';});
+    var dot=hasDone?'<div class="cdot" style="background:var(--gn)"></div>':hasSched?'<div class="cdot" style="background:var(--pk)"></div>':'';
+    html+='<div class="'+cls+'" data-date="'+ds+'" style="'+(isSel?'outline:2px solid var(--pk);border-radius:6px;':'')+'">'+d+dot+'</div>';
+  }
+  var grid=document.getElementById('cal-days');
+  if(grid){
+    grid.innerHTML=html;
+    grid.onclick=function(e){var el=e.target.closest('[data-date]');if(el)selCalDate(el.dataset.date);};
+  }
+  updCalSum(posts,y,m);
+  if(selDate)renderDatePanel(selDate);
+}
+
+function selCalDate(ds){
+  selDate=ds;
+  document.getElementById('no-date-msg').style.display='none';
+  document.getElementById('date-panel').style.display='block';
+  var pts=ds.split('-');
+  document.getElementById('sel-date-lbl').textContent=parseInt(pts[1])+'月'+parseInt(pts[2])+'日の投稿';
+  renderDatePanel(ds);renderCalendar();
+}
+
+function renderDatePanel(ds){
+  var posts=loadCal().filter(function(p){return p.date===ds;}).sort(function(a,b){return a.time.localeCompare(b.time);});
+  var box=document.getElementById('date-posts');if(!box)return;
+  if(!posts.length){box.innerHTML='<div style="font-size:13px;color:var(--txt3);padding:8px 0">この日の投稿はありません</div>';return;}
+  box.innerHTML=posts.map(function(p){
+    var tcls=p.status==='done'?'tg-g':'tg-p', tlbl=p.status==='done'?'投稿済み':'予約中';
+    return '<div style="padding:11px;background:var(--card2);border-radius:var(--rsm);margin-bottom:8px;border:1px solid var(--bdr)">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">' +
+        '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--gd2);font-family:var(--mono)">'+p.time+'</span><span class="stg '+tcls+'">'+tlbl+'</span><span class="stg tg-gd" style="font-size:9px">'+p.tmpl+'</span></div>' +
+        '<div style="display:flex;gap:5px"><button class="bsm" style="padding:3px 9px;font-size:11px" data-edit="'+p.id+'">編集</button><button class="bsm" style="padding:3px 9px;font-size:11px;border-color:var(--rd);color:var(--rd)" data-del="'+p.id+'">削除</button></div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--txt2);line-height:1.5">'+p.text.replace(/\n/g,' ').slice(0,55)+(p.text.length>55?'…':'')+'</div></div>';
+  }).join('');
+  box.onclick=function(e){
+    var eb=e.target.closest('[data-edit]'),db=e.target.closest('[data-del]');
+    if(eb)calEdit(eb.dataset.edit);if(db)calDel(db.dataset.del);
+  };
+}
+
+function updCalSum(posts,y,m){
+  var ms=y+'-'+pad2(m+1), mp=posts.filter(function(p){return p.date.startsWith(ms);});
   var done=mp.filter(function(p){return p.status==='done';}).length;
   var sched=mp.filter(function(p){return p.status==='scheduled';}).length;
   var total=Math.max(done+sched,1);
-  var cd=document.getElementById('cnt-done');
-  var cs=document.getElementById('cnt-sched');
-  var bd=document.getElementById('bar-done');
-  var bs=document.getElementById('bar-sched');
-  if(cd)cd.textContent=done+'\u4ef6';
-  if(cs)cs.textContent=sched+'\u4ef6';
-  if(bd)bd.style.width=Math.round(done/total*100)+'%';
-  if(bs)bs.style.width=Math.round(sched/total*100)+'%';
+  document.getElementById('cnt-done').textContent=done+'件';
+  document.getElementById('cnt-sched').textContent=sched+'件';
+  document.getElementById('bar-done').style.width=Math.round(done/total*100)+'%';
+  document.getElementById('bar-sched').style.width=Math.round(sched/total*100)+'%';
 }
 
-var tmplDef={
-  '\u7206\u76ca\u5831\u544a':'\uD83D\uDD25\u300c\u78ba\u5b9a\u5229\u76ca\u5831\u544a\u300d\n\n\u4eca\u9031\u306e\u5229\u76ca\u3092\u767a\u8868\u3057\u307e\u3059\uff01\n\n#FX\u81ea\u52d5\u58f2\u8cb7 #EA',
-  '\u52dd\u7387\u5b9f\u7e3e':'\uD83D\uDCCA\u300c\u52dd\u7387\u5b9f\u7e3e\u300d\n\n\u52dd\u7387:87.3% \u6708\u9593\u5229\u76ca:+284,500\u5186\n\n#EA #FX\u5b9f\u7e3e',
-  '\u9650\u5b9a\u717d\u308a':'\uD83D\uDEA8\u6b8b\u308a3\u679a\u3002\u4eca\u9031\u91d1\u66dc\u3067\u7de0\u3081\u5207\u308a\u307e\u3059\n\n#EA #FX #\u9650\u5b9a',
-  '\u7dca\u6025\u901f\u5831':'\u26A1\u300c\u7dca\u6025\u300d\u30c9\u30eb\u5186\u304c\u30ec\u30b8\u30b9\u30bf\u30f3\u30b9\u7a81\u7834\uD83D\uDD34\n\n#FX\u901f\u5831 #EA',
-  '\u4fe1\u983c\u69cb\u7bc9':'\uD83C\uDFC6\u904b\u75283\u5e74\u3067\u7d2f\u8a08+8,420,000\u5186\uD83D\uDCB0\n\n#FX #EA #\u4e0d\u52b4\u6240\u5f97',
-  'EA\u7d39\u4ecb':'\uD83E\uDD16\u300cEA\u7d39\u4ecb\u300d\n\u2705\u30b9\u30ad\u30e3\u30eb\u30d4\u30f3\u30b0\u7279\u5316\n\u2705\u6700\u5927DD3%\u4ee5\u4e0b\n\n#EA #FX\u81ea\u52d5\u58f2\u8cb7'
-};
+function changeMonth(dir){
+  calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}
+  selDate=null;document.getElementById('date-panel').style.display='none';document.getElementById('no-date-msg').style.display='block';
+  renderCalendar();
+}
 
-window.openAddModal=function(){
-  if(!selDate)return;
-  editId=null;
-  var ttl=document.getElementById('modal-ttl');
-  var sbtn=document.getElementById('modal-save-btn');
-  var tmpl=document.getElementById('m-tmpl');
-  var txt=document.getElementById('m-text');
-  var tim=document.getElementById('m-time');
-  var sts=document.getElementById('m-status');
-  var modal=document.getElementById('cal-modal');
-  if(ttl)ttl.textContent='\u6295\u7a3f\u3092\u8ffd\u52a0';
-  if(sbtn)sbtn.textContent='\u8ffd\u52a0\u3059\u308b';
-  if(tmpl)tmpl.value='\u7206\u76ca\u5831\u544a';
-  if(txt)txt.value=tmplDef['\u7206\u76ca\u5831\u544a']||'';
-  if(tim)tim.value='21:00';
-  if(sts)sts.value='scheduled';
-  if(modal)modal.style.display='flex';
-};
+var TMPL_DEF={'女の子紹介':'本日のおすすめキャストをご紹介！','稼げる訴求':'実際いくら稼げる？詳しくはDMへ','店舗の雰囲気':'アットホームな雰囲気が自慢です','スタッフ投稿':'担当スタッフです。何でも相談してください','求人募集':'急募！日払い・週払いOK','体験入店':'体験入店随時受付中 送迎あり・強制なし'};
 
-window.calEditPost=function(id){
-  var p=lp().find(function(x){return x.id===id;});
-  if(!p)return;
-  editId=id;
-  var ttl=document.getElementById('modal-ttl');
-  var sbtn=document.getElementById('modal-save-btn');
-  var modal=document.getElementById('cal-modal');
-  if(ttl)ttl.textContent='\u6295\u7a3f\u3092\u7de8\u96c6';
-  if(sbtn)sbtn.textContent='\u4fdd\u5b58\u3059\u308b';
-  document.getElementById('m-tmpl').value=p.tmpl;
-  document.getElementById('m-text').value=p.text;
-  document.getElementById('m-time').value=p.time;
-  document.getElementById('m-status').value=p.status;
-  if(modal)modal.style.display='flex';
-};
+document.getElementById('m-tmpl').addEventListener('change',function(){document.getElementById('m-text').value=TMPL_DEF[this.value]||'';});
 
-window.saveCalPost=function(){
-  var posts=lp();
-  var entry={
-    id:editId||gid(),
-    date:selDate,
-    tmpl:document.getElementById('m-tmpl').value,
-    text:(document.getElementById('m-text').value||'').trim(),
-    time:document.getElementById('m-time').value,
-    status:document.getElementById('m-status').value
-  };
-  if(!entry.text){alert('\u6295\u7a3f\u5185\u5bb9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044');return;}
-  if(editId){
-    var idx=posts.findIndex(function(p){return p.id===editId;});
-    if(idx>=0)posts[idx]=entry;
-  }else{
-    posts.push(entry);
-  }
-  sp(posts);
-  window.closeCalModal();
-  window.renderCalendar();
-};
+function openCalModal(){
+  if(!selDate)return;calEditId=null;
+  document.getElementById('cal-modal-ttl').textContent='投稿を追加';document.getElementById('cal-save-btn').textContent='追加する';
+  document.getElementById('m-tmpl').value='女の子紹介';document.getElementById('m-text').value=TMPL_DEF['女の子紹介'];
+  document.getElementById('m-time').value='21:00';document.getElementById('m-status').value='scheduled';
+  document.getElementById('cal-modal').style.display='flex';
+}
+function calEdit(id){
+  var p=loadCal().find(function(x){return x.id===id;});if(!p)return;
+  calEditId=id;document.getElementById('cal-modal-ttl').textContent='投稿を編集';document.getElementById('cal-save-btn').textContent='保存する';
+  document.getElementById('m-tmpl').value=p.tmpl;document.getElementById('m-text').value=p.text;
+  document.getElementById('m-time').value=p.time;document.getElementById('m-status').value=p.status;
+  document.getElementById('cal-modal').style.display='flex';
+}
+function saveCalPost(){
+  var posts=loadCal();
+  var entry={id:calEditId||calId(),date:selDate,tmpl:document.getElementById('m-tmpl').value,text:(document.getElementById('m-text').value||'').trim(),time:document.getElementById('m-time').value,status:document.getElementById('m-status').value};
+  if(!entry.text){alert('投稿内容を入力してください');return;}
+  if(calEditId){var i=posts.findIndex(function(p){return p.id===calEditId;});if(i>=0)posts[i]=entry;}else posts.push(entry);
+  saveCal(posts);closeCalModal();renderCalendar();
+}
+function calDel(id){calDelId=id;document.getElementById('cal-del-modal').style.display='flex';}
+function confirmCalDel(){saveCal(loadCal().filter(function(p){return p.id!==calDelId;}));document.getElementById('cal-del-modal').style.display='none';calDelId=null;renderCalendar();}
+function closeCalModal(){document.getElementById('cal-modal').style.display='none';calEditId=null;}
 
-window.calDeletePost=function(id){delId=id;document.getElementById('del-modal').style.display='flex';};
-window.confirmCalDelete=function(){
-  sp(lp().filter(function(p){return p.id!==delId;}));
-  document.getElementById('del-modal').style.display='none';
-  delId=null;
-  window.renderCalendar();
-};
-window.closeCalModal=function(){
-  document.getElementById('cal-modal').style.display='none';
-  editId=null;
-};
-
-// tmpl auto-fill
-document.addEventListener('DOMContentLoaded',function(){
-  var sel=document.getElementById('m-tmpl');
-  if(sel)sel.addEventListener('change',function(){
-    var ta=document.getElementById('m-text');
-    if(ta)ta.value=tmplDef[this.value]||'';
-  });
-});
-
-// Hook into go()
-var origGo=window.go;
-window.go=function(n){
-  if(origGo)origGo(n);
-  if(n==='cal')setTimeout(window.renderCalendar,0);
-};
-})();
-
-
-// ── ACCOUNT ENGINE ──
-(function(){
-var ACKEY='noctis_accounts';
-var platIco={x:'\u{1D54F}',threads:'\uD83E\uDDE5',bluesky:'\uD83E\uDD8B',note:'\uD83D\uDCDD'};
-var platName={x:'X (Twitter)',threads:'Threads',bluesky:'Bluesky',note:'note'};
-
-var defaultAccounts=[
-  {id:'ac1',platform:'x',handle:'@stella_shinjuku_official',memo:'\u30e1\u30a4\u30f3\u30a2\u30ab\u30a6\u30f3\u30c8',followers:12400,active:true},
-  {id:'ac2',platform:'x',handle:'@stella_shinjuku_cast',memo:'\u30b7\u30b0\u30ca\u30eb\u914d\u4fe1\u7528',followers:8400,active:true},
-  {id:'ac3',platform:'x',handle:'@stella_sub',memo:'\u30b4\u30fc\u30eb\u30c9EA\u5c02\u7528',followers:5100,active:false},
-  {id:'ac4',platform:'threads',handle:'@stella_shinjuku_official',memo:'Threads\u9023\u643a',followers:3200,active:false},
-  {id:'ac5',platform:'bluesky',handle:'@stella.bsky.social',memo:'\u30ea\u30b9\u30af\u5206\u6563\u7528',followers:890,active:false},
-  {id:'ac6',platform:'note',handle:'stella-shinjuku',memo:'\u9577\u6587\u30b3\u30f3\u30c6\u30f3\u30c4',followers:0,active:false},
-  {id:'ac7',platform:'x',handle:'@stella_line',memo:'\u30b5\u30d6\u5782',followers:1250,active:false}
-];
-
-function loadAc(){
+// ── HASHTAG ───────────────────────────────────────────────────────────────────
+async function genHashtags(){
+  var genre=document.getElementById('ht-genre').value, area=(document.getElementById('ht-area').value||'新宿').trim();
+  var btn=document.getElementById('ht-btn');btn.disabled=true;btn.textContent='生成中...';
+  document.getElementById('ht-loading').style.display='block';document.getElementById('ht-result').style.display='none';
+  var prompt='風俗店舗（'+genre+'・'+area+'）のX(Twitter)投稿に使う効果的なハッシュタグを10個生成してください。求人応募者を集めることが目的です。フォロワーが増えやすく凍結リスクが低い表現にしてください。ハッシュタグのみを改行区切りで出力。前置き不要。';
   try{
-    var s=localStorage.getItem(ACKEY);
-    return s?JSON.parse(s):defaultAccounts;
-  }catch(e){return defaultAccounts;}
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    document.getElementById('ht-loading').style.display='none';document.getElementById('ht-result').style.display='block';
+    document.getElementById('ht-tags').textContent=data.content?.[0]?.text||'生成に失敗しました';
+  }catch(e){document.getElementById('ht-loading').style.display='none';document.getElementById('ht-result').style.display='block';document.getElementById('ht-tags').textContent='エラーが発生しました';}
+  btn.disabled=false;btn.textContent='ハッシュタグを生成する';
 }
-function saveAc(a){localStorage.setItem(ACKEY,JSON.stringify(a));}
-function genAcId(){return 'ac'+Date.now().toString(36);}
+function cpHashtags(){
+  var text=document.getElementById('ht-tags').textContent;
+  if(navigator.clipboard)navigator.clipboard.writeText(text).catch(function(){});
+  var btn=document.getElementById('ht-copy');btn.textContent='コピーしました！';setTimeout(function(){btn.textContent='コピーする';},2000);
+}
 
-// Init defaults if not stored
-if(!localStorage.getItem(ACKEY))saveAc(defaultAccounts);
+// ── SNS CONNECT MODAL ─────────────────────────────────────────────────────────
+var connectingSns='';
+function showConnect(name){
+  connectingSns=name;
+  document.getElementById('sns-modal-ttl').textContent=name+'を連携する';
+  document.getElementById('sns-modal-desc').textContent='OAuth認証でセキュアに接続します';
+  document.getElementById('sns-modal').style.display='flex';
+}
+function showDisconnect(name){
+  if(confirm(name+'との連携を解除しますか？')) showToast(name+'の連携を解除しました（デモ）');
+}
+function closeSnsModal(){document.getElementById('sns-modal').style.display='none';}
+function doConnect(){
+  showToast(connectingSns+'と連携しました（デモ）');
+  closeSnsModal();
+}
 
-window.renderAcList=function(){
-  var acs=loadAc();
-  var badge=document.getElementById('cfg-ac-count');
-  if(badge)badge.textContent=acs.length+' / 10アカウント';
-  var box=document.getElementById('cfg-aclist');
-  if(!box)return;
-  var pi={x:'𝕏',threads:'🧥',bluesky:'🦋',note:'📝'};
-  var pn={x:'X (Twitter)',threads:'Threads',bluesky:'Bluesky',note:'note'};
-  box.innerHTML=acs.map(function(ac){
-    var ico=pi[ac.platform]||'📱';
-    var name=pn[ac.platform]||ac.platform;
-    var fol=ac.followers?ac.followers.toLocaleString()+' フォロワー':'';
-    var on=ac.active;
-    var tbg=on?'background:#4D96FF;':'background:rgba(255,255,255,0.15);';
-    var tpos=on?'left:21px':'left:3px';
-    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;margin-bottom:8px">'+
-      '<div style="font-size:22px;flex-shrink:0">'+ico+'</div>'+
-      '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:14px;font-weight:700;color:#FFFFFF">'+ac.handle+'</div>'+
-        '<div style="font-size:12px;color:#8892B0;margin-top:2px">'+name+' · '+ac.memo+'</div>'+
-        (fol?'<div style="font-size:12px;color:#00D4FF;margin-top:2px">'+fol+'</div>':'')+
-      '</div>'+
-      '<div data-acid="'+ac.id+'" style="width:42px;height:24px;border-radius:12px;cursor:pointer;position:relative;flex-shrink:0;transition:background 0.2s;'+tbg+'">'+
-        '<div style="position:absolute;top:3px;'+tpos+';width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s"></div>'+
-      '</div>'+
-    '</div>';
-  }).join('');
-  box.onclick=function(e){
-    var tog=e.target.closest('[data-acid]');
-    if(!tog)return;
-    var id=tog.dataset.acid;
-    var acs2=loadAc();
-    var ac=acs2.find(function(a){return a.id===id;});
-    if(ac){ac.active=!ac.active;saveAc(acs2);window.renderAcList();window.renderPostAcGrid();}
-  };
-};
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg){
+  var t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--pkb);color:var(--txt);font-size:13px;padding:10px 18px;border-radius:20px;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.5);font-family:var(--font)';
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove();},2500);
+}
 
-window.renderPostAcGrid=function(){
-  var box=document.getElementById('post-ac-grid');
-  if(!box)return;
-  var acs=loadAc();
-  if(!acs.length){
-    box.innerHTML='<div style="grid-column:span 2;font-size:13px;color:#8892B0;padding:12px 0">設定からアカウントを追加してください</div>';
-    return;
-  }
-  var pi={x:'𝕏',threads:'🧥',bluesky:'🦋',note:'📝'};
-  var pn={x:'X (Twitter)',threads:'Threads',bluesky:'Bluesky',note:'note'};
-  box.innerHTML=acs.map(function(ac){
-    var ico=pi[ac.platform]||'📱';
-    var name=pn[ac.platform]||ac.platform;
-    var fol=ac.followers?ac.followers.toLocaleString()+' フォロワー':'';
-    var active=ac.active;
-    var bg=active?'background:rgba(201,168,76,0.18);border:2px solid rgba(201,168,76,0.7);':'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);';
-    var chk=active?'<div style="position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;background:#C9A84C;color:#0A0A0F;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700">✓</div>':'';
-    return '<div data-postac="'+ac.id+'" style="'+bg+'border-radius:10px;padding:13px 11px;cursor:pointer;position:relative;transition:all 0.15s">'+
-      chk+
-      '<div style="font-size:22px;margin-bottom:6px">'+ico+'</div>'+
-      '<div style="font-size:13px;font-weight:700;color:#FFFFFF;margin-bottom:3px">'+ac.handle+'</div>'+
-      '<div style="font-size:11px;color:#8892B0;margin-bottom:3px">'+name+'</div>'+
-      (fol?'<div style="font-size:11px;color:#00D4FF">'+fol+'</div>':'')+
-    '</div>';
-  }).join('');
-  box.onclick=function(e){
-    var card=e.target.closest('[data-postac]');
-    if(!card)return;
-    var id=card.dataset.postac;
-    var acs2=loadAc();
-    var ac=acs2.find(function(a){return a.id===id;});
-    if(ac){ac.active=!ac.active;saveAc(acs2);window.renderPostAcGrid();window.renderAcList();}
-  };
-};
-
-window.bldConf=function(){
-  var acs=loadAc().filter(function(a){return a.active;});
-  var box=document.getElementById('mpc');
-  if(!box)return;
-  var ico=platIco;
-  box.innerHTML=acs.map(function(ac){
-    return '<div class="mpr"><div class="mpl"><span style="font-size:13px">'+(ico[ac.platform]||'\uD83D\uDCF1')+'</span>'+ac.handle+'</div><span class="mst ms-w">\u914d\u4fe1\u4e88\u5b9a</span></div>';
-  }).join('')||'<div style="color:var(--txt3);font-size:11px;padding:7px 0">\u30a2\u30ab\u30a6\u30f3\u30c8\u304c\u9078\u629e\u3055\u308c\u3066\u3044\u307e\u305b\u3093</div>';
-};
-
-window.sDone=function(){
-  var names=loadAc().filter(function(a){return a.active;}).map(function(a){return a.handle;});
-  document.getElementById('pres').style.display='none';
-  var dd=document.getElementById('ddet');
-  if(dd)dd.textContent=(names.length?names.join(' / '):'\u9078\u629e\u306a\u3057')+' \u306b\u6295\u7a3f\u3057\u307e\u3057\u305f\u3002\n\u6b21\u306e\u6295\u7a3f\u306f21:00\u306b\u4e88\u5b9a\u3055\u308c\u3066\u3044\u307e\u3059\u3002';
-  document.getElementById('pdone').style.display='block';
-};
-
-// Add account modal
-window.openAddAcModal=function(){
-  var acs=loadAc();
-  if(acs.length>=10){alert('\u767b\u9332\u5c4a\u304c\u6e80\u6557\u3067\u3059\uff0810\u4ef6\u4ee5\u4e0a\u306f\u767b\u9332\u3067\u304d\u307e\u305b\u3093\uff09');return;}
-  var m=document.getElementById('addac-modal');
-  if(m)m.style.display='flex';
-};
-window.closeAddAcModal=function(){
-  var m=document.getElementById('addac-modal');
-  if(m)m.style.display='none';
-};
-window.saveNewAc=function(){
-  var handle=(document.getElementById('ac-handle').value||'').trim();
-  if(!handle){alert('\u30a2\u30ab\u30a6\u30f3\u30c8\u540d\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044');return;}
-  var acs=loadAc();
-  if(acs.length>=10){alert('\u6e80\u6558\u3067\u3059');return;}
-  acs.push({
-    id:genAcId(),
-    platform:document.getElementById('ac-platform').value,
-    handle:handle.startsWith('@')?handle:'@'+handle,
-    memo:document.getElementById('ac-memo').value||'',
-    followers:parseInt(document.getElementById('ac-fol').value)||0,
-    active:true
-  });
-  saveAc(acs);
-  window.closeAddAcModal();
-  window.renderAcList();
-};
-
-// Hook go() to render on navigate
-var _prevGo2=window.go;
-window.go=function(n){
-  if(_prevGo2)_prevGo2(n);
-  if(n==='cfg')setTimeout(window.renderAcList,0);
-  if(n==='post')setTimeout(window.renderPostAcGrid,0);
-};
-
-// Init on load
+// ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',function(){
-  window.renderAcList();
-  window.renderPostAcGrid();
+  renderPostGrid();
+  renderDmList();
+  renderCalendar();
 });
-})();
-
 </script>
 </body>
 </html>
