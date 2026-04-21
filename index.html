@@ -358,26 +358,21 @@ html,body{height:100%;width:100%;font-family:var(--font);background:var(--bg)}
       </div>
       <div class="ngok">&#10003; NGワードなし　凍結リスク：低</div>
 
-      <!-- AI画像生成 -->
-      <div class="sec">AI画像生成（Instagram・TikTok用）</div>
+      <!-- 広告画像生成（キャンバス） -->
+      <div class="sec">広告画像を生成（Instagram・TikTok用）</div>
       <div style="background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--r);padding:14px;margin-bottom:12px">
-        <div style="font-size:12px;color:var(--txt3);margin-bottom:10px">投稿文の内容からAIが自動でSNS用画像を生成します</div>
-        <div style="display:flex;gap:8px;margin-bottom:10px;overflow-x:auto;padding-bottom:4px">
-          <button class="bsm" id="img-style-1" onclick="selectImgStyle('華やか・ポップ')" style="white-space:nowrap;font-size:12px;border-color:var(--pkb);color:var(--pk2)">ピンク・キュート</button>
-          <button class="bsm" id="img-style-2" onclick="selectImgStyle('高級感・洗練')" style="white-space:nowrap;font-size:12px">高級感・黒金</button>
-          <button class="bsm" id="img-style-3" onclick="selectImgStyle('ナチュラル')" style="white-space:nowrap;font-size:12px">ナチュラル</button>
-          <button class="bsm" id="img-style-4" onclick="selectImgStyle('夜・ネオン・都会的')" style="white-space:nowrap;font-size:12px">ネオン・都会</button>
+        <div style="font-size:12px;color:var(--txt3);margin-bottom:10px">投稿文から広告バナーを即座に生成します。日本語テキスト入り・無料。</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:4px">
+          <button class="bsm" data-theme="pink" onclick="selectTheme(this,'pink')" style="white-space:nowrap;font-size:12px;border-color:var(--pkb);color:var(--pk2)">ピンク</button>
+          <button class="bsm" data-theme="gold" onclick="selectTheme(this,'gold')" style="white-space:nowrap;font-size:12px">ゴールド</button>
+          <button class="bsm" data-theme="dark" onclick="selectTheme(this,'dark')" style="white-space:nowrap;font-size:12px">ダーク</button>
+          <button class="bsm" data-theme="natural" onclick="selectTheme(this,'natural')" style="white-space:nowrap;font-size:12px">ナチュラル</button>
         </div>
-        <button class="btn" id="img-gen-btn" onclick="genImage()" style="padding:12px;font-size:13px;margin-bottom:12px">画像を生成する（DALL-E 3）</button>
-        <div id="img-loading" style="display:none;text-align:center;padding:20px 0;color:var(--txt3);font-size:13px">
-          <span class="spin">&#8987;</span> 広告画像を生成中...（20〜30秒）
-        </div>
-        <div id="img-result" style="display:none">
-          <img id="gen-image" src="" style="width:100%;border-radius:var(--rsm);margin-bottom:10px;display:block" alt="生成された画像">
-          <div style="display:flex;gap:8px">
-            <button class="btn" onclick="downloadImage()" style="flex:1;padding:11px;font-size:13px">ダウンロード</button>
-            <button class="bsm" onclick="genImage()" style="flex:1;padding:11px;font-size:12px">再生成する</button>
-          </div>
+        <button class="btn" onclick="genCanvas()" style="padding:12px;font-size:13px;margin-bottom:12px">広告画像を生成する</button>
+        <canvas id="ad-canvas" style="width:100%;border-radius:var(--rsm);display:none;margin-bottom:10px"></canvas>
+        <div id="canvas-btns" style="display:none;flex;gap:8px">
+          <button class="btn" onclick="downloadCanvas()" style="flex:1;padding:11px;font-size:13px">ダウンロード</button>
+          <button class="bsm" onclick="genCanvas()" style="flex:1;padding:11px;font-size:12px">再生成する</button>
         </div>
       </div>
 
@@ -1442,6 +1437,147 @@ function previewUpload(event) {
   };
   reader.readAsDataURL(file);
 }
+
+// ── CANVAS AD GENERATOR ──────────────────────────────────────────────────────
+var currentTheme = 'pink';
+var THEMES = {
+  pink:    { bg:['#FF6B9D','#FF4D8D','#FF85B3','#FFB3CC'], accent:'#FFD700', textMain:'#FFFFFF', textSub:'rgba(255,255,255,0.85)', bubble:'rgba(255,255,255,0.95)', bubbleText:'#FF4D8D' },
+  gold:    { bg:['#1A0F00','#2D1A00','#3D2500','#1A0F00'], accent:'#FFD700', textMain:'#FFD700', textSub:'#FFF8DC',               bubble:'rgba(255,215,0,0.95)',     bubbleText:'#1A0F00' },
+  dark:    { bg:['#0D0020','#1A0035','#2D004D','#0D0020'], accent:'#FF4DFF', textMain:'#FFFFFF', textSub:'#E0AAFF',               bubble:'rgba(180,0,255,0.85)',     bubbleText:'#FFFFFF' },
+  natural: { bg:['#FFF0F5','#FFE4EC','#FFDAE6','#FFF0F5'], accent:'#FF6B9D', textMain:'#CC2066', textSub:'#993355',              bubble:'rgba(255,105,160,0.9)',    bubbleText:'#FFFFFF' }
+};
+
+function selectTheme(btn, theme) {
+  currentTheme = theme;
+  document.querySelectorAll('[data-theme]').forEach(function(b){ b.style.borderColor=''; b.style.color=''; });
+  btn.style.borderColor = 'var(--pkb)'; btn.style.color = 'var(--pk2)';
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+function genCanvas() {
+  var ta = document.getElementById('gen-ta');
+  var postText = ta ? ta.value.trim() : '';
+  if (!postText) { showToast('先に投稿文を生成してください'); return; }
+
+  var canvas = document.getElementById('ad-canvas');
+  var W = 1080, H = 1920;
+  canvas.width = W; canvas.height = H;
+  canvas.style.display = 'block';
+  var cb = document.getElementById('canvas-btns');
+  if (cb) { cb.style.display = 'flex'; }
+
+  var ctx = canvas.getContext('2d');
+  var T = THEMES[currentTheme] || THEMES.pink;
+
+  // 背景
+  var grad = ctx.createLinearGradient(0, 0, W, H);
+  T.bg.forEach(function(c,i){ grad.addColorStop(i/(T.bg.length-1), c); });
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+
+  // 装飾円
+  [[W*0.88,H*0.06,220],[W*0.12,H*0.18,160],[W*0.85,H*0.48,190],[W*0.08,H*0.72,200],[W*0.9,H*0.88,170]].forEach(function(c){
+    ctx.save(); ctx.beginPath(); ctx.arc(c[0],c[1],c[2],0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.12)'; ctx.fill(); ctx.restore();
+  });
+
+  // キーワード抽出
+  var kws = [];
+  if (postText.includes('未経験')) kws.push('未経験大歓迎！');
+  if (postText.includes('高収入')||postText.includes('稼げ')) kws.push('高収入保証あり');
+  if (postText.includes('体験入店')) kws.push('体験入店OK');
+  if (postText.includes('日払い')) kws.push('日払い・週払いOK');
+  if (postText.includes('副業')) kws.push('副業・WワークOK');
+  if (postText.includes('送迎')) kws.push('送迎あり');
+  if (postText.includes('相談')) kws.push('相談・見学無料');
+  while (kws.length < 4) kws.push(['サポート万全！','安心してスタート','お気軽にDM歓迎','強制一切なし'][kws.length]);
+
+  // メインタイトル
+  var title = '【' + kws[0] + '】';
+  ctx.save();
+  ctx.font = 'bold 100px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 10;
+  ctx.strokeText(title, W/2, 60);
+  ctx.fillStyle = T.accent; ctx.fillText(title, W/2, 60);
+  ctx.restore();
+
+  // サブ見出し
+  ctx.save();
+  ctx.font = 'bold 68px sans-serif';
+  ctx.fillStyle = T.textMain; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText('新しいチャンスを探している', W/2, 220);
+  ctx.fillText('あなたへ！', W/2, 300);
+  ctx.restore();
+
+  // 吹き出しカード
+  kws.slice(0, 5).forEach(function(kw, i) {
+    var cardY = 420 + i * 240;
+    var cardX = 60, cardW = W - 120, cardH = 200;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.18)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
+    roundRect(ctx, cardX, cardY, cardW, cardH, 60);
+    ctx.fillStyle = T.bubble; ctx.fill();
+    ctx.restore();
+    // チェック
+    ctx.save(); ctx.font = 'bold 80px sans-serif'; ctx.fillStyle = T.accent;
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.fillText('✓', cardX + 36, cardY + cardH/2); ctx.restore();
+    // テキスト
+    ctx.save(); ctx.font = 'bold 62px sans-serif'; ctx.fillStyle = T.bubbleText;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(kw, W/2 + 20, cardY + cardH/2); ctx.restore();
+  });
+
+  // ハッシュタグ
+  var tags = (postText.match(/#[^\s#]+/g) || []).slice(0,4).join('  ');
+  if (tags) {
+    ctx.save(); ctx.font = '48px sans-serif'; ctx.fillStyle = T.textSub;
+    ctx.textAlign = 'center'; ctx.fillText(tags, W/2, H - 230); ctx.restore();
+  }
+
+  // ボトムバナー
+  ctx.save();
+  ctx.fillStyle = T.accent; ctx.fillRect(0, H - 180, W, 180);
+  ctx.font = 'bold 56px sans-serif';
+  ctx.fillStyle = currentTheme==='pink' ? '#FF4D8D' : (currentTheme==='natural' ? '#FF4D8D' : '#FFFFFF');
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('エントリーはお気軽にDMへ！', W/2, H - 90);
+  ctx.restore();
+
+  // ハート
+  ['♥','♡','♥','♡','♥','♡'].forEach(function(h,i){
+    var positions = [{x:80,y:360},{x:W-80,y:390},{x:140,y:H*0.62},{x:W-100,y:H*0.65},{x:70,y:H*0.82},{x:W-70,y:H*0.84}];
+    ctx.save(); ctx.font = '70px sans-serif'; ctx.fillStyle = T.accent;
+    ctx.globalAlpha = 0.7; ctx.textAlign='center';
+    ctx.fillText(h, positions[i].x, positions[i].y); ctx.restore();
+  });
+
+  // スター装飾
+  ['★','☆','★','☆'].forEach(function(s,i){
+    var sp = [{x:200,y:140},{x:W-200,y:140},{x:160,y:H*0.55},{x:W-160,y:H*0.55}];
+    ctx.save(); ctx.font = '60px sans-serif'; ctx.fillStyle = T.accent;
+    ctx.globalAlpha = 0.8; ctx.textAlign='center';
+    ctx.fillText(s, sp[i].x, sp[i].y); ctx.restore();
+  });
+
+  showToast('広告画像を生成しました！');
+}
+
+function downloadCanvas() {
+  var canvas = document.getElementById('ad-canvas');
+  var a = document.createElement('a');
+  a.download = 'noctis_ad_' + Date.now() + '.png';
+  a.href = canvas.toDataURL('image/png'); a.click();
+  showToast('ダウンロードしました');
+}
+
 </script>
 </body>
 </html>
