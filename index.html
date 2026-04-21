@@ -1376,16 +1376,18 @@ async function genImage() {
   }[selectedImgStyle] || 'bright pink background with hearts and sparkles';
 
   // DALL-E 3用プロンプト（縦長・日本語テキスト入り広告）
-  var imagePrompt = 'Vertical portrait format Japanese job recruitment advertisement poster for adult entertainment venue. ' +
+  var imagePrompt = 
+    'VERTICAL TALL PORTRAIT poster, taller than wide, 9:16 aspect ratio. ' +
+    'Japanese hostess club recruitment advertisement. ' +
     bgStyle + '. ' +
-    'Beautiful smiling young Japanese woman in cute casual outfit on the right side. ' +
-    'Large decorative Japanese text on the left and top: ' + kwText + '. ' +
-    'Bold outlined Japanese kanji text, colorful speech bubbles with Japanese text. ' +
-    'Sparkles, hearts, star decorations throughout. ' +
-    'Professional Japanese advertisement design, mobile app banner style. ' +
-    'Similar to Japanese hostess club recruitment flyer. ' +
-    'Vivid colors, high contrast, eye-catching layout. ' +
-    'Portrait orientation 9:16 ratio. High quality photorealistic.';
+    'Smiling young Japanese woman standing upright on right side. ' +
+    'TOP of poster has large bold Japanese text in pink and yellow: ' + keywords[0] + '. ' +
+    'Middle section has Japanese text bubbles saying: ' + kwText + '. ' +
+    'Bottom has more Japanese recruitment text. ' +
+    'Hearts, sparkles, star shapes as decoration. ' +
+    'ALL text must be real readable Japanese hiragana and kanji. ' +
+    'Colorful vivid pink advertisement flyer design. ' +
+    'DO NOT rotate - image must be portrait/vertical orientation.';
 
   try {
     var imgRes = await fetch('/api/claude', {
