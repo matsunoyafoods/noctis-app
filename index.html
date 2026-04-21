@@ -1248,7 +1248,7 @@ function loadApiKey() {
 function saveApiKey() {
   var key = (document.getElementById('api-key-input').value || '').trim();
   if (!key) { showToast('APIキーを入力してください'); return; }
-  if (!key.startsWith('sk-')) { showToast('正しいClaude APIキーを入力してください（sk-で始まる）'); return; }
+  if (!key.startsWith('sk-ant-')) { showToast('正しいClaude APIキーを入力してください（sk-ant-で始まる）'); return; }
   localStorage.setItem(API_KEY_STORAGE, key);
   updateApiKeyStatus();
   showToast('APIキーを保存しました');
