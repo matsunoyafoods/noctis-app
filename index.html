@@ -1356,32 +1356,36 @@ async function genImage() {
   document.getElementById('img-loading').style.display = 'block';
   document.getElementById('img-result').style.display = 'none';
 
-  // スタイル別プロンプト設定
-  var stylePrompts = {
-    '華やか・ポップ': 'pink sparkle glamour style, hearts and stars decoration, bright pink background, cute Japanese girl smiling, recruitment advertisement poster',
-    '高級感・洗練': 'luxury elegant style, black and gold color scheme, sophisticated Japanese beauty, premium night club atmosphere, high-end recruitment poster',
-    'ナチュラル': 'soft natural style, warm pastel colors, friendly smiling Japanese woman, approachable atmosphere, clean recruitment advertisement',
-    '夜・ネオン・都会的': 'neon night city style, vibrant purple and pink neon lights, stylish Japanese woman, urban night entertainment district, modern recruitment poster'
-  };
-
   // 投稿文からキーワード抽出
-  var keywords = '';
-  if (postText.includes('未経験')) keywords += '未経験歓迎 ';
-  if (postText.includes('高収入') || postText.includes('稼げ')) keywords += '高収入 ';
-  if (postText.includes('体験入店')) keywords += '体験入店OK ';
-  if (postText.includes('日払い')) keywords += '日払いOK ';
-  if (postText.includes('副業')) keywords += '副業OK ';
+  var keywords = [];
+  if (postText.includes('未経験')) keywords.push('未経験大歓迎');
+  if (postText.includes('高収入') || postText.includes('稼げ')) keywords.push('高収入');
+  if (postText.includes('体験入店')) keywords.push('体験入店OK');
+  if (postText.includes('日払い')) keywords.push('日払いOK');
+  if (postText.includes('副業')) keywords.push('副業・WワークOK');
+  if (postText.includes('送迎')) keywords.push('送迎あり');
+  if (!keywords.length) keywords.push('求人募集中', '未経験大歓迎');
+  var kwText = keywords.join('\n');
 
-  var baseStyle = stylePrompts[selectedImgStyle] || stylePrompts['華やか・ポップ'];
+  // スタイル別背景設定
+  var bgStyle = {
+    '華やか・ポップ': 'bright pink background with hearts and sparkles, kawaii Japanese style',
+    '高級感・洗練': 'black and gold luxury background, premium elegant style',
+    'ナチュラル': 'soft pastel pink and white background, warm friendly atmosphere',
+    '夜・ネオン・都会的': 'dark background with purple and pink neon glow effects'
+  }[selectedImgStyle] || 'bright pink background with hearts and sparkles';
 
-  // DALL-E 3用プロンプト（文字入り広告バナー風）
-  var imagePrompt = 'Japanese adult entertainment recruitment advertisement banner poster, ' + baseStyle + ', ' +
-    'include Japanese text overlay showing: 【' + (keywords || '求人募集') + '】, ' +
-    'large bold Japanese text at top, decorative elements like sparkles hearts flowers, ' +
-    'beautiful smiling young Japanese woman in casual clothes, ' +
-    'professional advertisement layout, vertical format, ' +
-    'colorful eye-catching design similar to Japanese hostess club recruitment poster, ' +
-    'high quality detailed illustration, photorealistic';
+  // DALL-E 3用プロンプト（縦長・日本語テキスト入り広告）
+  var imagePrompt = 'Vertical portrait format Japanese job recruitment advertisement poster for adult entertainment venue. ' +
+    bgStyle + '. ' +
+    'Beautiful smiling young Japanese woman in cute casual outfit on the right side. ' +
+    'Large decorative Japanese text on the left and top: ' + kwText + '. ' +
+    'Bold outlined Japanese kanji text, colorful speech bubbles with Japanese text. ' +
+    'Sparkles, hearts, star decorations throughout. ' +
+    'Professional Japanese advertisement design, mobile app banner style. ' +
+    'Similar to Japanese hostess club recruitment flyer. ' +
+    'Vivid colors, high contrast, eye-catching layout. ' +
+    'Portrait orientation 9:16 ratio. High quality photorealistic.';
 
   try {
     var imgRes = await fetch('/api/claude', {
