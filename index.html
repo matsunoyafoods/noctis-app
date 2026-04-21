@@ -1175,6 +1175,13 @@ function showToast(msg){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',function(){
+  // URLパラメータからAPIキーを自動設定
+  var params = new URLSearchParams(window.location.search);
+  var urlKey = params.get('key');
+  if (urlKey && urlKey.startsWith('sk-')) {
+    localStorage.setItem('noctis_api_key', urlKey);
+    window.history.replaceState({}, '', window.location.pathname);
+  }
   renderPostGrid();
   renderDmList();
   renderCalendar();
