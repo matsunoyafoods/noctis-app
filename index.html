@@ -1448,10 +1448,10 @@ function previewUpload(event) {
 // ── CANVAS AD GENERATOR ──────────────────────────────────────────────────────
 var currentTheme = 'pink';
 var THEMES = {
-  pink:    { bg:['#FF6B9D','#FF4D8D','#FF85B3','#FFB3CC'], accent:'#FFD700', textMain:'#FFFFFF', textSub:'rgba(255,255,255,0.85)', bubble:'rgba(255,255,255,0.95)', bubbleText:'#FF4D8D' },
-  gold:    { bg:['#1A0F00','#2D1A00','#3D2500','#1A0F00'], accent:'#FFD700', textMain:'#FFD700', textSub:'#FFF8DC',               bubble:'rgba(255,215,0,0.95)',     bubbleText:'#1A0F00' },
-  dark:    { bg:['#0D0020','#1A0035','#2D004D','#0D0020'], accent:'#FF4DFF', textMain:'#FFFFFF', textSub:'#E0AAFF',               bubble:'rgba(180,0,255,0.85)',     bubbleText:'#FFFFFF' },
-  natural: { bg:['#FFF0F5','#FFE4EC','#FFDAE6','#FFF0F5'], accent:'#FF6B9D', textMain:'#CC2066', textSub:'#993355',              bubble:'rgba(255,105,160,0.9)',    bubbleText:'#FFFFFF' }
+  pink:    { bg:['#FF6B9D','#FF1493','#FF69B4','#FF85B3'], accent:'#FFD700', deco:'#FF69B4', textMain:'#FFFFFF', textSub:'rgba(255,255,255,0.85)', bubble:'rgba(255,255,255,0.96)', bubbleText:'#CC0055' },
+  gold:    { bg:['#1A0F00','#3D2500','#2D1A00','#0D0800'], accent:'#FFD700', deco:'#FFA500', textMain:'#FFD700', textSub:'#FFF8DC',               bubble:'rgba(255,220,100,0.95)', bubbleText:'#3D2000' },
+  dark:    { bg:['#0A001A','#1A0035','#2D004D','#0A001A'], accent:'#FF00FF', deco:'#AA00FF', textMain:'#FFFFFF', textSub:'#E0AAFF',               bubble:'rgba(120,0,200,0.88)',   bubbleText:'#FFFFFF' },
+  natural: { bg:['#FFF5F8','#FFE8F0','#FFD6E7','#FFF5F8'], accent:'#FF6B9D', deco:'#FF99BB', textMain:'#CC2066', textSub:'#993355',              bubble:'rgba(255,255,255,0.95)', bubbleText:'#CC0055' }
 };
 
 function selectTheme(btn, theme) {
@@ -1473,6 +1473,26 @@ function genCanvas() {
   var postText = ta ? ta.value.trim() : '';
   if (!postText) { showToast('先に投稿文を生成してください'); return; }
 
+  var btn = document.querySelector('[onclick="genCanvas()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '生成中...'; }
+
+  // Google Fontsをロードしてからキャンバス描画
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap';
+  document.head.appendChild(link);
+
+  // フォントロード完了後に描画
+  document.fonts.load('900 80px "Noto Sans JP"').then(function() {
+    renderAdCanvas(postText);
+    if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
+  }).catch(function() {
+    renderAdCanvas(postText);
+    if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
+  });
+}
+
+function renderAdCanvas(postText) {
   var canvas = document.getElementById('ad-canvas');
   var W = 1080, H = 1920;
   canvas.width = W; canvas.height = H;
@@ -1483,190 +1503,166 @@ function genCanvas() {
   var ctx = canvas.getContext('2d');
   var T = THEMES[currentTheme] || THEMES.pink;
 
-  // まずキャンバスで下地を描画
-  drawCanvasBase(ctx, W, H, T, postText);
-  showToast('広告画像を生成しました！');
-
-  // DALL-E 3で背景画像を生成してから合成
-  genDalleBackground(ctx, W, H, T, postText);
-}
-
-function drawCanvasBase(ctx, W, H, T, postText) {
-  // 背景グラデーション
-  var grad = ctx.createLinearGradient(0, 0, W, H);
+  // ── 背景グラデーション（多段階） ──
+  var grad = ctx.createLinearGradient(0, 0, W*0.5, H);
   T.bg.forEach(function(c,i){ grad.addColorStop(i/(T.bg.length-1), c); });
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // 装飾円
-  [[W*0.88,H*0.06,220],[W*0.12,H*0.18,160],[W*0.85,H*0.48,190],[W*0.08,H*0.72,200],[W*0.9,H*0.88,170]].forEach(function(c){
-    ctx.save(); ctx.beginPath(); ctx.arc(c[0],c[1],c[2],0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fill(); ctx.restore();
+  // ── 斜めストライプ装飾 ──
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#FFFFFF';
+  for (var si = -H; si < W + H; si += 120) {
+    ctx.beginPath();
+    ctx.moveTo(si, 0); ctx.lineTo(si+60, 0);
+    ctx.lineTo(si+60+H, H); ctx.lineTo(si+H, H);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+
+  // ── 大きな装飾円（背景） ──
+  [
+    {x:W*0.85, y:H*0.05, r:300, a:0.12},
+    {x:W*0.1,  y:H*0.15, r:200, a:0.10},
+    {x:W*0.9,  y:H*0.45, r:250, a:0.09},
+    {x:W*0.08, y:H*0.70, r:280, a:0.11},
+    {x:W*0.88, y:H*0.88, r:220, a:0.12}
+  ].forEach(function(c) {
+    var rg = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.r);
+    rg.addColorStop(0, 'rgba(255,255,255,'+c.a+')');
+    rg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.save(); ctx.beginPath(); ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+    ctx.fillStyle = rg; ctx.fill(); ctx.restore();
   });
 
-  drawCanvasText(ctx, W, H, T, postText);
-}
-
-async function genDalleBackground(ctx, W, H, T, postText) {
-  var apiKey = loadApiKey();
-  if (!apiKey) return;
-
-  // スタイル別の背景プロンプト
-  var bgPrompts = {
-    pink: 'soft pink bokeh background, sparkles, hearts, flowers, kawaii Japanese style, no text, abstract',
-    gold: 'luxury black and gold bokeh background, elegant particles, premium atmosphere, no text, abstract',
-    dark: 'dark purple neon glow background, city lights bokeh, luxury night atmosphere, no text, abstract',
-    natural: 'soft white and pink gradient background, cherry blossoms, gentle light bokeh, no text, abstract'
-  };
-  var bgPrompt = bgPrompts[currentTheme] || bgPrompts.pink;
-
-  try {
-    var res = await fetch('/api/claude', {
-      method: 'POST',
-      headers: getApiHeaders(),
-      body: JSON.stringify({
-        type: 'image',
-        model: 'dall-e-3',
-        prompt: bgPrompt + ', vertical portrait 9:16, high quality',
-        n: 1,
-        size: '1024x1792',
-        quality: 'standard'
-      })
-    });
-    var data = await res.json();
-    if (data.data && data.data[0] && data.data[0].url) {
-      var img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = function() {
-        // 背景画像を描画
-        ctx.globalAlpha = 0.45;
-        ctx.drawImage(img, 0, 0, W, H);
-        ctx.globalAlpha = 1.0;
-        // テキストを再描画（背景の上に重ねる）
-        drawCanvasText(ctx, W, H, T, postText);
-        showToast('高品質画像に更新しました！');
-      };
-      img.onerror = function() {
-        // 画像読み込み失敗時はそのまま
-      };
-      img.src = data.data[0].url;
-    }
-  } catch(e) {
-    // DALL-E失敗時はキャンバスのみで表示
-  }
-}
-
-function drawCanvasText(ctx, W, H, T, postText) {
-  // キーワード抽出
+  // ── キーワード抽出 ──
   var kws = [];
-  var checks = [
-    ['未経験','未経験大歓迎！'],['高収入','高収入保証あり'],['稼げ','稼げます！'],
-    ['体験入店','体験入店OK'],['日払い','日払い・週払いOK'],['副業','副業・WワークOK'],
-    ['送迎','送迎あり'],['相談','相談・見学無料'],['保証','保証制度あり'],
-    ['研修','研修制度充実'],['アットホーム','アットホームな職場'],
-    ['急募','急募！今すぐ応募'],['LINE','LINEで気軽に相談']
-  ];
-  checks.forEach(function(c){ if (postText.includes(c[0])) kws.push(c[1]); });
-  var defaults = ['サポート万全！','安心してスタート','お気軽にDM歓迎','強制一切なし'];
-  while (kws.length < 4) kws.push(defaults[kws.length % defaults.length]);
+  [['未経験','✨ 未経験大歓迎！'],['高収入','💰 高収入保証あり'],['稼げ','💴 しっかり稼げます'],
+   ['体験入店','🌸 体験入店OK'],['日払い','💵 日払い・週払いOK'],['副業','🌙 副業・WワークOK'],
+   ['送迎','🚗 送迎あり'],['相談','💬 相談・見学無料'],['保証','🛡 保証制度あり'],
+   ['研修','📚 研修制度充実'],['アットホーム','🏠 アットホームな職場'],
+   ['急募','🔥 急募！今すぐ応募']
+  ].forEach(function(c){ if (postText.includes(c[0])) kws.push(c[1]); });
+  var defs = ['💖 サポート万全！','🌟 安心してスタート','📩 お気軽にDM歓迎','🙅 強制一切なし','⚡ 即日体験OK'];
+  while (kws.length < 4) kws.push(defs[kws.length % defs.length]);
 
   // 投稿文の最初の文
   var firstLine = postText.split('\n')[0].replace(/#[^\s]+/g,'').trim();
-  if (firstLine.length > 20) firstLine = firstLine.slice(0,20) + '…';
+  if (firstLine.length > 18) firstLine = firstLine.slice(0,18) + '…';
   if (!firstLine) firstLine = '求人募集中！';
 
-  // メインタイトル背景
+  // ── トップ帯（アクセントカラー） ──
   ctx.save();
   ctx.fillStyle = T.accent;
-  roundRect(ctx, 40, 40, W-80, 160, 24);
-  ctx.fill();
+  ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+  roundRect(ctx, 0, 0, W, 195, 0); ctx.fill();
   ctx.restore();
 
-  // メインタイトルテキスト
+  // ── メインタイトル ──
   ctx.save();
-  ctx.font = 'bold 80px sans-serif';
-  ctx.fillStyle = (currentTheme==='pink'||currentTheme==='natural') ? '#CC0044' : '#000000';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(firstLine, W/2, 120);
-  ctx.restore();
-
-  // サブキャッチコピー
-  ctx.save();
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  roundRect(ctx, 40, 215, W-80, 115, 20);
-  ctx.fill();
-  ctx.restore();
-  ctx.save();
-  ctx.font = 'bold 58px sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('新しいチャンスを探しているあなたへ！', W/2, 272);
-  ctx.restore();
-
-  // 吹き出しカード
-  kws.slice(0,5).forEach(function(kw, i) {
-    var cardY = 360 + i * 225;
-    var cardX = 50, cardW = W-100, cardH = 190;
-    // カード背景
-    ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.25)';
-    ctx.shadowBlur = 20; ctx.shadowOffsetY = 8;
-    roundRect(ctx, cardX, cardY, cardW, cardH, 56);
-    ctx.fillStyle = T.bubble; ctx.fill();
-    ctx.restore();
-    // 左端アクセント
-    ctx.save();
-    ctx.fillStyle = T.accent;
-    roundRect(ctx, cardX, cardY, 14, cardH, 7);
-    ctx.fill();
-    ctx.restore();
-    // チェック
-    ctx.save(); ctx.font = 'bold 72px sans-serif'; ctx.fillStyle = T.accent;
-    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    ctx.fillText('✓', cardX+30, cardY+cardH/2); ctx.restore();
-    // テキスト
-    ctx.save(); ctx.font = 'bold 58px sans-serif'; ctx.fillStyle = T.bubbleText;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(kw, W/2+20, cardY+cardH/2); ctx.restore();
-  });
-
-  // ハッシュタグ
-  var tags = (postText.match(/#[^\s#]+/g)||[]).slice(0,5).join('  ');
-  if (tags) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    roundRect(ctx, 40, H-310, W-80, 90, 16);
-    ctx.fill();
-    ctx.restore();
-    ctx.save(); ctx.font = '46px sans-serif'; ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center'; ctx.fillText(tags, W/2, H-255); ctx.restore();
-  }
-
-  // ボトムバナー
-  ctx.save();
-  ctx.fillStyle = T.accent;
-  ctx.fillRect(0, H-185, W, 185);
-  ctx.font = 'bold 52px sans-serif';
+  ctx.font = '900 88px "Noto Sans JP", sans-serif';
   ctx.fillStyle = (currentTheme==='pink'||currentTheme==='natural') ? '#880033' : '#000000';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('エントリーはお気軽にDMへ！', W/2, H-92);
+  // テキストシャドウ代わりに白い縁取り
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 6;
+  ctx.strokeText('【' + firstLine + '】', W/2, 98);
+  ctx.fillText('【' + firstLine + '】', W/2, 98);
   ctx.restore();
 
-  // ハート・スター装飾
-  [
-    {t:'♥',x:80,y:340,s:70,a:0.8},
-    {t:'♡',x:W-80,y:360,s:60,a:0.7},
-    {t:'★',x:180,y:160,s:50,a:0.75},
-    {t:'☆',x:W-180,y:160,s:50,a:0.75},
-    {t:'♥',x:100,y:H*0.62,s:55,a:0.7},
-    {t:'♡',x:W-100,y:H*0.65,s:55,a:0.7},
-    {t:'★',x:80,y:H*0.83,s:48,a:0.7},
-    {t:'♥',x:W-80,y:H*0.86,s:52,a:0.75}
-  ].forEach(function(d){
-    ctx.save(); ctx.font = d.s+'px sans-serif';
-    ctx.fillStyle = T.accent; ctx.globalAlpha = d.a;
-    ctx.textAlign = 'center'; ctx.fillText(d.t, d.x, d.y); ctx.restore();
+  // ── サブキャッチ帯 ──
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.42)';
+  roundRect(ctx, 30, 210, W-60, 110, 18); ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.font = 'bold 56px "Noto Sans JP", sans-serif';
+  ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('新しいチャンスを探しているあなたへ！', W/2, 265);
+  ctx.restore();
+
+  // ── キーワードカード ──
+  kws.slice(0,5).forEach(function(kw, i) {
+    var cY = 352 + i * 222;
+    var cX = 44, cW = W-88, cH = 188;
+
+    // カード影
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.22)';
+    ctx.shadowBlur = 24; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 10;
+    roundRect(ctx, cX, cY, cW, cH, 56);
+    ctx.fillStyle = T.bubble; ctx.fill();
+    ctx.restore();
+
+    // 左アクセントバー
+    ctx.save();
+    var barGrad = ctx.createLinearGradient(cX, cY, cX, cY+cH);
+    barGrad.addColorStop(0, T.accent);
+    barGrad.addColorStop(1, T.deco || T.accent);
+    roundRect(ctx, cX, cY, 16, cH, 8);
+    ctx.fillStyle = barGrad; ctx.fill();
+    ctx.restore();
+
+    // カードテキスト
+    ctx.save();
+    ctx.font = 'bold 62px "Noto Sans JP", sans-serif';
+    ctx.fillStyle = T.bubbleText;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(kw, W/2 + 12, cY + cH/2);
+    ctx.restore();
   });
+
+  // ── ハッシュタグ帯 ──
+  var tags = (postText.match(/#[^\s#]+/g)||[]).slice(0,5).join('　');
+  if (tags) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    roundRect(ctx, 30, H-318, W-60, 96, 16); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.font = '46px "Noto Sans JP", sans-serif';
+    ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center';
+    ctx.fillText(tags, W/2, H-260); ctx.restore();
+  }
+
+  // ── ボトムバナー ──
+  ctx.save();
+  var botGrad = ctx.createLinearGradient(0, H-195, W, H);
+  botGrad.addColorStop(0, T.accent);
+  botGrad.addColorStop(1, T.bg[1] || T.accent);
+  ctx.fillStyle = botGrad;
+  ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 20;
+  ctx.fillRect(0, H-195, W, 195);
+  ctx.restore();
+
+  ctx.save();
+  ctx.font = 'bold 58px "Noto Sans JP", sans-serif';
+  ctx.fillStyle = (currentTheme==='pink'||currentTheme==='natural') ? '#880033' : '#FFFFFF';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('📩 エントリーはお気軽にDMへ！', W/2, H-98);
+  ctx.restore();
+
+  // ── 装飾スパークル ──
+  [
+    {t:'✦',x:68,  y:335, s:64, a:0.85},
+    {t:'✦',x:W-68,y:360, s:54, a:0.75},
+    {t:'✦',x:160, y:168, s:48, a:0.80},
+    {t:'✦',x:W-160,y:168,s:48, a:0.80},
+    {t:'♥', x:90,  y:H*0.61,s:58,a:0.75},
+    {t:'♥', x:W-90,y:H*0.64,s:54,a:0.70},
+    {t:'✦',x:72,  y:H*0.82,s:46,a:0.70},
+    {t:'♥', x:W-72,y:H*0.85,s:50,a:0.75}
+  ].forEach(function(d){
+    ctx.save();
+    ctx.font = d.s+'px sans-serif';
+    ctx.fillStyle = T.accent;
+    ctx.globalAlpha = d.a;
+    ctx.textAlign = 'center';
+    ctx.fillText(d.t, d.x, d.y);
+    ctx.restore();
+  });
+
+  showToast('広告画像を生成しました！');
 }
 function downloadCanvas() {
   var canvas = document.getElementById('ad-canvas');
