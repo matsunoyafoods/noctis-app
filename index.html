@@ -1474,25 +1474,62 @@ function genCanvas() {
   if (!postText) { showToast('先に投稿文を生成してください'); return; }
 
   var btn = document.querySelector('[onclick="genCanvas()"]');
-  if (btn) { btn.disabled = true; btn.textContent = '生成中...'; }
+  if (btn) { btn.disabled = true; btn.textContent = '生成中...（20秒）'; }
 
-  // Google Fontsをロードしてからキャンバス描画
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap';
-  document.head.appendChild(link);
+  // Step1: まずキャンバスで即座に表示
+  document.fonts.load('900 80px "Noto Sans JP"').then(function(){
+    renderAdCanvas(postText, null);
+  }).catch(function(){ renderAdCanvas(postText, null); });
 
-  // フォントロード完了後に描画
-  document.fonts.load('900 80px "Noto Sans JP"').then(function() {
-    renderAdCanvas(postText);
-    if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
-  }).catch(function() {
-    renderAdCanvas(postText);
-    if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
-  });
+  // Step2: DALL-E 3で背景を生成して合成
+  genDalleBg(postText, btn);
 }
 
-function renderAdCanvas(postText) {
+async function genDalleBg(postText, btn) {
+  var bgPrompts = {
+    pink:    'beautiful pink bokeh background, soft pink sparkles, hearts floating, cherry blossoms, dreamy atmosphere, Japanese style, no people, no text, high quality photography',
+    gold:    'luxury black velvet background with golden particles, shimmer, elegant bokeh lights, premium atmosphere, no people, no text, high quality',
+    dark:    'dark purple night sky, neon pink and purple bokeh, city lights, glamorous luxury atmosphere, no people, no text, high quality',
+    natural: 'soft white and pastel pink background, gentle bokeh, flowers, warm light, cozy Japanese style, no people, no text, high quality photography'
+  };
+  var prompt = bgPrompts[currentTheme] || bgPrompts.pink;
+
+  try {
+    var res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: getApiHeaders(),
+      body: JSON.stringify({
+        type: 'image',
+        model: 'dall-e-3',
+        prompt: prompt,
+        n: 1,
+        size: '1024x1792',
+        quality: 'hd'
+      })
+    });
+    var data = await res.json();
+    if (data.data && data.data[0] && data.data[0].url) {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        renderAdCanvas(postText, img);
+        showToast('高品質画像に更新しました！');
+        if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
+      };
+      img.onerror = function() {
+        if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
+      };
+      img.src = data.data[0].url;
+    } else {
+      if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = '広告画像を生成する'; }
+  }
+}
+
+
+function renderAdCanvas(postText, bgImage) {
   var canvas = document.getElementById('ad-canvas');
   var W = 1080, H = 1920;
   canvas.width = W; canvas.height = H;
@@ -1508,6 +1545,23 @@ function renderAdCanvas(postText) {
   T.bg.forEach(function(c,i){ grad.addColorStop(i/(T.bg.length-1), c); });
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
+
+  // ── DALL-E背景画像を合成 ──
+  if (bgImage) {
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.drawImage(bgImage, 0, 0, W, H);
+    ctx.globalAlpha = 1.0;
+    ctx.restore();
+    // 上からグラデーションを重ねて見やすくする
+    var overlay = ctx.createLinearGradient(0, 0, 0, H);
+    overlay.addColorStop(0, T.bg[0].replace(')', ',0.65)').replace('rgb', 'rgba'));
+    overlay.addColorStop(0.3, 'rgba(0,0,0,0.1)');
+    overlay.addColorStop(0.7, 'rgba(0,0,0,0.1)');
+    overlay.addColorStop(1, T.bg[1].replace(')', ',0.75)').replace('rgb', 'rgba'));
+    ctx.fillStyle = overlay;
+    ctx.fillRect(0, 0, W, H);
+  }
 
   // ── 斜めストライプ装飾 ──
   ctx.save();
